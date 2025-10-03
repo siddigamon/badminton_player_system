@@ -46,7 +46,6 @@ class _PlayersState extends State<Players> {
       strength: LevelStrength.strong,
       dateJoined: DateTime.now().subtract(const Duration(days: 60)),
     ),
-
   ];
 
   List<PlayerItem> get filteredPlayers {
@@ -79,6 +78,48 @@ class _PlayersState extends State<Players> {
     setState(() {
       playerItems.add(player);
     });
+  }
+
+  void _deletePlayer(int index) async {
+    final playerToDelete = filteredPlayers[index];
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Player'),
+        content: Text('Are you sure you want to delete ${playerToDelete.nickname}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      setState(() {
+        playerItems.remove(playerToDelete);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${playerToDelete.nickname} deleted'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setState(() {
+                playerItems.add(playerToDelete);
+              });
+            },
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -163,7 +204,62 @@ class _PlayersState extends State<Players> {
                   child: ListView.builder(
                     itemCount: filteredPlayers.length,
                     itemBuilder: (context, index) {
-                      return PlayerItemWidget(filteredPlayers[index]);
+                      final player = filteredPlayers[index];
+                      return Dismissible(
+                        key: Key(player.nickname + player.dateJoined.toString()),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          color: Colors.red,
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        confirmDismiss: (direction) async {
+                          return await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Delete Player'),
+                              content: Text('Are you sure you want to delete ${player.nickname}?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        onDismissed: (direction) {
+                          final deletedPlayer = player;
+                          setState(() {
+                            playerItems.remove(player);
+                          });
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${deletedPlayer.nickname} deleted'),
+                              action: SnackBarAction(
+                                label: 'Undo',
+                                onPressed: () {
+                                  setState(() {
+                                    playerItems.add(deletedPlayer);
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        child: PlayerItemWidget(player),
+                      );
                     },
                   ),
                 ),
