@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:badminton_player_system/model/player_items.dart';
+import 'package:intl/intl.dart';
+
 
 class NewPlayer extends StatefulWidget {
   final void Function(PlayerItem player) onAddPlayer;
@@ -19,6 +21,8 @@ class _NewPlayerState extends State<NewPlayer> {
 
   BadmintonLevel _selectedLevel = BadmintonLevel.beginners;
   LevelStrength _selectedStrength = LevelStrength.mid;
+  DateTime? _pickedDate;
+
 
   @override
   void dispose() {
@@ -42,15 +46,31 @@ class _NewPlayerState extends State<NewPlayer> {
       remarks: _remarksController.text,
       level: _selectedLevel,
       strength: _selectedStrength,
-      dateJoined: DateTime.now(),
+      dateJoined: _pickedDate!,
     );
 
     widget.onAddPlayer(player);
     Navigator.pop(context);
   }
 
+  void _showDatePopup() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)), // Allow dates up to 1 year ago
+      lastDate: DateTime.now(), // Can't join in the future
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _pickedDate = pickedDate;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final formatter = DateFormat.yMd();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Player'),
@@ -63,10 +83,62 @@ class _NewPlayerState extends State<NewPlayer> {
             TextField(
               controller: _nicknameController,
               decoration: const InputDecoration(labelText: 'Nickname'),
+              keyboardType: TextInputType.text,
+              maxLength: 30,
             ),
-            // Add other form fields...
-            // Add level slider...
-            // Add action buttons...
+            TextField(
+              controller: _fullNameController,
+              decoration: const InputDecoration(labelText: 'Full Name'),
+              keyboardType: TextInputType.text,
+              maxLength: 50,
+            ),
+            TextField(
+              controller: _contactController,
+              decoration: const InputDecoration(labelText: 'Contact Number'),
+              keyboardType: TextInputType.phone,
+              maxLength: 15,
+            ),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+              keyboardType: TextInputType.emailAddress,
+              maxLength: 50,
+            ),
+            TextField(
+              controller: _addressController,
+              decoration: const InputDecoration(labelText: 'Address'),
+              keyboardType: TextInputType.text,
+              maxLength: 100,
+            ),
+            TextField(
+              controller: _remarksController,
+              decoration: const InputDecoration(labelText: 'Remarks'),
+              keyboardType: TextInputType.text,
+              maxLength: 200,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: () {
+                _showDatePopup();
+              },
+              label: Text(
+                _pickedDate == null
+                    ? "Please select join date"
+                    : formatter.format(_pickedDate!),
+                textAlign: TextAlign.left,
+                style: const TextStyle(color: Colors.white),
+              ),
+              icon: const Icon(Icons.calendar_today),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2.0),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            //toDO: Badminton Level DropDown
           ],
         ),
       ),
