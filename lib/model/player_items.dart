@@ -64,40 +64,40 @@ class PlayerItem {
     return formatter.format(dateJoined);
   }
 
-  String get levelDisplay {
-    switch (level) {
-      case BadmintonLevel.beginners:
-        return 'Beginners';
-      case BadmintonLevel.intermediate:
-        return 'Intermediate';
-      case BadmintonLevel.levelG:
-        return 'Level G';
-      case BadmintonLevel.levelF:
-        return 'Level F';
-      case BadmintonLevel.levelE:
-        return 'Level E';
-      case BadmintonLevel.levelD:
-        return 'Level D';
-      case BadmintonLevel.openPlayer:
-        return 'Open Player';
-    }
-  }
+  // String get levelDisplay {
+  //   switch (level) {
+  //     case BadmintonLevel.beginners:
+  //       return 'Beginners';
+  //     case BadmintonLevel.intermediate:
+  //       return 'Intermediate';
+  //     case BadmintonLevel.levelG:
+  //       return 'Level G';
+  //     case BadmintonLevel.levelF:
+  //       return 'Level F';
+  //     case BadmintonLevel.levelE:
+  //       return 'Level E';
+  //     case BadmintonLevel.levelD:
+  //       return 'Level D';
+  //     case BadmintonLevel.openPlayer:
+  //       return 'Open Player';
+  //   }
+  // }
 
-  String get strengthDisplay {
-    switch (strength) {
-      case LevelStrength.weak:
-        return 'Weak';
-      case LevelStrength.mid:
-        return 'Mid';
-      case LevelStrength.strong:
-        return 'Strong';
-    }
-  }
+  // String get strengthDisplay {
+  //   switch (strength) {
+  //     case LevelStrength.weak:
+  //       return 'Weak';
+  //     case LevelStrength.mid:
+  //       return 'Mid';
+  //     case LevelStrength.strong:
+  //       return 'Strong';
+  //   }
+  // }
 
-  String get fullLevelDescription {
-    return '$levelDisplay - $strengthDisplay';
+  // String get fullLevelDescription {
+  //   return '$levelDisplay - $strengthDisplay';
     
-  }
+  // }
 
   // Helper method to get level display for any level
   String _getLevelDisplayText(BadmintonLevel level) {
