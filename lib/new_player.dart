@@ -138,7 +138,48 @@ class _NewPlayerState extends State<NewPlayer> {
               ),
             ),
             const SizedBox(height: 20),
-            //toDO: Badminton Level DropDown
+            //toDO: Badminton Level DropDown using RangeSlider
+            DropdownButton<LevelStrength>(
+              value: _selectedStrength,
+              items: LevelStrength.values
+                  .map(
+                    (strength) => DropdownMenuItem(
+                      value: strength,
+                      child: Text(strength.name.toUpperCase()),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedStrength = value;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    _submitPlayerData();
+                  },
+                  child: const Text('Add Player'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
