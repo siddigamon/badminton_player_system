@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:badminton_player_system/model/player_items.dart';
 import 'package:badminton_player_system/new_player.dart';
 import 'package:badminton_player_system/widgets/player_item_widget.dart';
+import 'package:badminton_player_system/edit_player.dart';
 
 class Players extends StatefulWidget {
   const Players({super.key});
@@ -58,7 +59,7 @@ class _PlayersState extends State<Players> {
       rangeStartStrength: LevelStrength.mid,
       rangeEndLevel: BadmintonLevel.levelD,
       rangeEndStrength: LevelStrength.strong,
-      
+
     ),
   ];
 
@@ -93,6 +94,19 @@ class _PlayersState extends State<Players> {
       playerItems.add(player);
     });
   }
+
+  void _editPlayer(PlayerItem player) {
+  showModalBottomSheet(
+    useSafeArea: true,
+    isScrollControlled: true,
+    context: context,
+    builder: (ctx) => EditPlayer(
+      player: player,
+      onUpdatePlayer: _updatePlayerItem,
+      onDeletePlayer: _deletePlayerItem,
+    ),
+  );
+}
 
   void _deletePlayer(int index) async {
     final playerToDelete = filteredPlayers[index];
@@ -134,6 +148,39 @@ class _PlayersState extends State<Players> {
         ),
       );
     }
+  }
+  void _updatePlayerItem(PlayerItem updatedPlayer) {
+    setState(() {
+      final index = playerItems.indexWhere((p) => p.dateJoined == updatedPlayer.dateJoined);
+      if (index != -1) {
+        playerItems[index] = updatedPlayer;
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${updatedPlayer.nickname} updated successfully')),
+    );
+  }
+
+  // ADD THIS METHOD: Delete player from the list
+  void _deletePlayerItem(PlayerItem playerToDelete) {
+    setState(() {
+      playerItems.remove(playerToDelete);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${playerToDelete.nickname} deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              playerItems.add(playerToDelete);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -272,7 +319,10 @@ class _PlayersState extends State<Players> {
                             ),
                           );
                         },
-                        child: PlayerItemWidget(player),
+                        child: GestureDetector(
+                          onTap: () => _editPlayer(player),
+                          child: PlayerItemWidget(player),
+                        ),
                       );
                     },
                   ),
