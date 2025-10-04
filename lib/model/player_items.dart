@@ -38,6 +38,11 @@ class PlayerItem {
   final LevelStrength strength;
   final DateTime dateJoined;
 
+  final BadmintonLevel rangeStartLevel;
+  final LevelStrength rangeStartStrength;
+  final BadmintonLevel rangeEndLevel;
+  final LevelStrength rangeEndStrength;
+
   PlayerItem({
     required this.nickname,
     required this.fullName,
@@ -48,6 +53,10 @@ class PlayerItem {
     required this.level,
     required this.strength,
     required this.dateJoined,
+     required this.rangeStartLevel,
+    required this.rangeStartStrength,
+    required this.rangeEndLevel,
+    required this.rangeEndStrength,
   });
 
   String get formattedDateJoined {
@@ -87,6 +96,48 @@ class PlayerItem {
 
   String get fullLevelDescription {
     return '$levelDisplay - $strengthDisplay';
+    
+  }
+
+  // Helper method to get level display for any level
+  String _getLevelDisplayText(BadmintonLevel level) {
+    switch (level) {
+      case BadmintonLevel.beginners:
+        return 'Beginners';
+      case BadmintonLevel.intermediate:
+        return 'Intermediate';
+      case BadmintonLevel.levelG:
+        return 'G';
+      case BadmintonLevel.levelF:
+        return 'F';
+      case BadmintonLevel.levelE:
+        return 'E';
+      case BadmintonLevel.levelD:
+        return 'D';
+      case BadmintonLevel.openPlayer:
+        return 'Open';
+    }
+  }
+
+  // Helper method to get strength display for any strength
+  String _getStrengthDisplayText(LevelStrength strength) {
+    switch (strength) {
+      case LevelStrength.weak:
+        return 'Weak';
+      case LevelStrength.mid:
+        return 'Mid';
+      case LevelStrength.strong:
+        return 'Strong';
+    }
+  }
+
+   String get rangeDescription {
+    final startStrength = _getStrengthDisplayText(rangeStartStrength);
+    final startLevel = _getLevelDisplayText(rangeStartLevel);
+    final endStrength = _getStrengthDisplayText(rangeEndStrength);
+    final endLevel = _getLevelDisplayText(rangeEndLevel);
+    
+    return '$startStrength $startLevel, $endStrength $endLevel';
   }
 }
 

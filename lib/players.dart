@@ -23,6 +23,10 @@ class _PlayersState extends State<Players> {
       level: BadmintonLevel.levelE,
       strength: LevelStrength.strong,
       dateJoined: DateTime.now().subtract(const Duration(days: 30)),
+      rangeStartLevel: BadmintonLevel.levelF,
+      rangeStartStrength: LevelStrength.mid,
+      rangeEndLevel: BadmintonLevel.levelE,
+      rangeEndStrength: LevelStrength.strong,
     ),
     PlayerItem(
       nickname: 'Rookie',
@@ -34,6 +38,11 @@ class _PlayersState extends State<Players> {
       level: BadmintonLevel.beginners,
       strength: LevelStrength.weak,
       dateJoined: DateTime.now().subtract(const Duration(days: 7)),
+      rangeStartLevel: BadmintonLevel.beginners,
+      rangeStartStrength: LevelStrength.weak,
+      rangeEndLevel: BadmintonLevel.intermediate,
+      rangeEndStrength: LevelStrength.mid,
+
     ),
     PlayerItem(
       nickname: 'ProShuttle',
@@ -45,6 +54,11 @@ class _PlayersState extends State<Players> {
       level: BadmintonLevel.levelD,
       strength: LevelStrength.strong,
       dateJoined: DateTime.now().subtract(const Duration(days: 60)),
+      rangeStartLevel: BadmintonLevel.levelE,
+      rangeStartStrength: LevelStrength.mid,
+      rangeEndLevel: BadmintonLevel.levelD,
+      rangeEndStrength: LevelStrength.strong,
+      
     ),
   ];
 

@@ -33,7 +33,13 @@ class PlayerItemWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(playerItem.fullLevelDescription),
+                Text(
+                  playerItem.rangeDescription,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue,
+                  ),
+                ),
                 const Spacer(),
                 Icon(levelIcons[playerItem.level]),
                 const SizedBox(width: 5),
