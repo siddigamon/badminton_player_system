@@ -215,7 +215,7 @@ class _PlayersState extends State<Players> {
                           size: 64,
                           color: Colors.grey,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                         Text(
                           _searchController.text.isEmpty
                               ? 'No players added yet'
@@ -229,8 +229,9 @@ class _PlayersState extends State<Players> {
                   ),
                 )
               : Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
                     itemCount: filteredPlayers.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 5.0), 
                     itemBuilder: (context, index) {
                       final player = filteredPlayers[index];
                       return Dismissible(
@@ -251,7 +252,7 @@ class _PlayersState extends State<Players> {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               title: const Text('Delete Player'),
-                              content: Text('Are you sure you want to delete ${player.nickname}?'),
+                              content: Text('Deleting ${player.nickname}?'),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.of(ctx).pop(false),

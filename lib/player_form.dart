@@ -215,7 +215,7 @@ class _PlayerFormState extends State<PlayerForm> {
       body: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(15.0),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -223,32 +223,40 @@ class _PlayerFormState extends State<PlayerForm> {
                   controller: _nicknameController,
                   decoration: const InputDecoration(
                     labelText: 'Nickname *',
+                    prefix:  Icon(Icons.person),
                     border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   ),
                   keyboardType: TextInputType.text,
                   maxLength: 30,
                   validator: (value) => _validateRequired(value, 'Nickname'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 
                 TextFormField(
                   controller: _fullNameController,
                   decoration: const InputDecoration(
                     labelText: 'Full Name *',
                     border: OutlineInputBorder(),
+                    prefix:  Icon(Icons.person),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
                   ),
                   keyboardType: TextInputType.text,
                   maxLength: 50,
                   validator: (value) => _validateRequired(value, 'Full Name'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 
                 TextFormField(
                   controller: _contactController,
                   decoration: const InputDecoration(
                     labelText: 'Contact Number *',
                     border: OutlineInputBorder(),
+                    prefix:  Icon(Icons.phone),
                     hintText: '+1234567890',
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
                   ),
                   keyboardType: TextInputType.phone,
                   maxLength: 15,
@@ -257,7 +265,7 @@ class _PlayerFormState extends State<PlayerForm> {
                   ],
                   validator: _validatePhoneNumber,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 
                 TextFormField(
                   controller: _emailController,
@@ -265,25 +273,31 @@ class _PlayerFormState extends State<PlayerForm> {
                     labelText: 'Email *',
                     border: OutlineInputBorder(),
                     hintText: 'example@email.com',
+                    prefix: Icon(Icons.email),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
                   ),
                   keyboardType: TextInputType.emailAddress,
                   maxLength: 50,
                   validator: _validateEmail,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 
                 TextFormField(
                   controller: _addressController,
                   decoration: const InputDecoration(
                     labelText: 'Address *',
                     border: OutlineInputBorder(),
+                    prefix: const Icon(Icons.location_on),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
                   ),
                   keyboardType: TextInputType.multiline,
                   maxLines: 2,
                   maxLength: 100,
                   validator: (value) => _validateRequired(value, 'Address'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 
                 TextFormField(
                   controller: _remarksController,
@@ -291,12 +305,14 @@ class _PlayerFormState extends State<PlayerForm> {
                     labelText: 'Remarks',
                     border: OutlineInputBorder(),
                     helperText: 'Optional',
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
                   ),
                   keyboardType: TextInputType.multiline,
                   maxLines: 2,
                   maxLength: 200,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 
                 const Text(
                   'Badminton Level Range',
@@ -305,10 +321,10 @@ class _PlayerFormState extends State<PlayerForm> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
                 
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: Colors.amber.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -322,7 +338,7 @@ class _PlayerFormState extends State<PlayerForm> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 7),
                 
                 RangeSlider(
                   values: _levelRange,
@@ -343,7 +359,7 @@ class _PlayerFormState extends State<PlayerForm> {
                 ),
                 
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -358,7 +374,7 @@ class _PlayerFormState extends State<PlayerForm> {
                   ),
                 ),
                 
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 
                 const Row(
                   children: [
