@@ -314,18 +314,12 @@ class _PlayerFormState extends State<PlayerForm> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.amber.withOpacity(0.3)),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'From: ${_getDisplayText(_levelRange.start)}',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        'To: ${_getDisplayText(_levelRange.end)}',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                    ],
+                  child:  Text(
+                    'Range: ${_getDisplayText(_levelRange.start)} → ${_getDisplayText(_levelRange.end)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12, 
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
