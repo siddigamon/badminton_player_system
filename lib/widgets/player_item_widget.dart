@@ -8,45 +8,48 @@ class PlayerItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              playerItem.nickname,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              playerItem.fullName,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  playerItem.rangeDescription,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blue,
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                playerItem.nickname,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
                 ),
-                const Spacer(),
-                Icon(levelIcons[playerItem.level]),
-                const SizedBox(width: 5),
-                Text(playerItem.formattedDateJoined),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                  '${playerItem.fullName} • ${playerItem.rangeDescription}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       playerItem.rangeDescription,
+              //       style: const TextStyle(
+              //         fontWeight: FontWeight.w500,
+              //         color: Colors.blue,
+              //       ),
+              //     ),
+              //     // const Spacer(),
+              //     // Icon(levelIcons[playerItem.level]),
+              //     // const SizedBox(width: 5),
+              //     // Text(playerItem.formattedDateJoined),
+              //   ],
+              // ),
+            ],
+          ),
         ),
       ),
     );

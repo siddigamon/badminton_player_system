@@ -108,47 +108,7 @@ class _PlayersState extends State<Players> {
   );
 }
 
-  void _deletePlayer(int index) async {
-    final playerToDelete = filteredPlayers[index];
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Player'),
-        content: Text('Are you sure you want to delete ${playerToDelete.nickname}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldDelete == true) {
-      setState(() {
-        playerItems.remove(playerToDelete);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${playerToDelete.nickname} deleted'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              setState(() {
-                playerItems.add(playerToDelete);
-              });
-            },
-          ),
-        ),
-      );
-    }
-  }
+  
   void _updatePlayerItem(PlayerItem updatedPlayer) {
     setState(() {
       final index = playerItems.indexWhere((p) => p.dateJoined == updatedPlayer.dateJoined);
@@ -162,7 +122,6 @@ class _PlayersState extends State<Players> {
     );
   }
 
-  // ADD THIS METHOD: Delete player from the list
   void _deletePlayerItem(PlayerItem playerToDelete) {
     setState(() {
       playerItems.remove(playerToDelete);
@@ -189,16 +148,24 @@ class _PlayersState extends State<Players> {
       appBar: AppBar(
         title: const Text(
           'All Players',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _showAddPlayer();
-            },
-            icon: const Icon(
-              Icons.add,
-              color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: () {
+                _showAddPlayer();
+              },
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 18,
+                child: Icon(
+                  Icons.add,
+                  color: Colors.amber,
+                  size: 20,
+                ),
+              ),
             ),
           ),
         ],

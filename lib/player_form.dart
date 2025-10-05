@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:badminton_player_system/model/player_items.dart';
 
 class PlayerForm extends StatefulWidget {
@@ -20,6 +21,8 @@ class PlayerForm extends StatefulWidget {
 }
 
 class _PlayerFormState extends State<PlayerForm> {
+  final _formKey = GlobalKey<FormState>();
+  
   late final TextEditingController _nicknameController;
   late final TextEditingController _fullNameController;
   late final TextEditingController _contactController;
@@ -65,6 +68,45 @@ class _PlayerFormState extends State<PlayerForm> {
     super.dispose();
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address';
+    }
+    
+    return null;
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Contact number is required';
+    }
+    
+    final cleanedNumber = value.replaceAll(RegExp(r'[\s\-\+\(\)]'), '');
+    
+    if (cleanedNumber.length < 10 || cleanedNumber.length > 15) {
+      return 'Contact number must be between 10-15 digits';
+    }
+    
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (!numericRegex.hasMatch(cleanedNumber)) {
+      return 'Contact number must contain only numbers';
+    }
+    
+    return null;
+  }
+
+  String? _validateRequired(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
+  }
+
   (BadmintonLevel, LevelStrength) _getFromSliderValue(double value) {
     final levelIndex = (value / 3).floor();
     final strengthIndex = (value % 3).floor();
@@ -89,6 +131,24 @@ class _PlayerFormState extends State<PlayerForm> {
   }
 
   void _submitPlayerData() {
+    print('Form is valid: ${_formKey.currentState?.validate()}');
+
+    if (!_formKey.currentState!.validate()) {
+    print('Nickname: "${_nicknameController.text}"');
+    print('Full Name: "${_fullNameController.text}"');
+    print('Contact: "${_contactController.text}"');
+    print('Email: "${_emailController.text}"');
+    print('Address: "${_addressController.text}"');
+    
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fix the errors above'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final (startLevel, startStrength) = _getFromSliderValue(_levelRange.start);
     final (endLevel, endStrength) = _getFromSliderValue(_levelRange.end);
     
@@ -96,15 +156,15 @@ class _PlayerFormState extends State<PlayerForm> {
     final (selectedLevel, selectedStrength) = _getFromSliderValue(midpoint);
 
     final player = PlayerItem(
-      nickname: _nicknameController.text,
-      fullName: _fullNameController.text,
-      contactNumber: _contactController.text,
-      email: _emailController.text,
-      address: _addressController.text,
-      remarks: _remarksController.text,
+      nickname: _nicknameController.text.trim(),
+      fullName: _fullNameController.text.trim(),
+      contactNumber: _contactController.text.trim(),
+      email: _emailController.text.trim().toLowerCase(),
+      address: _addressController.text.trim(),
+      remarks: _remarksController.text.trim(),
       level: selectedLevel,
       strength: selectedStrength,
-      dateJoined: widget.existingPlayer?.dateJoined ?? DateTime.now(), // Keep original or set new
+      dateJoined: widget.existingPlayer?.dateJoined ?? DateTime.now(),
       rangeStartLevel: startLevel,
       rangeStartStrength: startStrength,
       rangeEndLevel: endLevel,
@@ -152,164 +212,225 @@ class _PlayerFormState extends State<PlayerForm> {
         title: Text(widget.title),
         backgroundColor: Colors.amber,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nicknameController,
-              decoration: const InputDecoration(labelText: 'Nickname'),
-              keyboardType: TextInputType.text,
-              maxLength: 30,
-            ),
-            TextField(
-              controller: _fullNameController,
-              decoration: const InputDecoration(labelText: 'Full Name'),
-              keyboardType: TextInputType.text,
-              maxLength: 50,
-            ),
-            TextField(
-              controller: _contactController,
-              decoration: const InputDecoration(labelText: 'Contact Number'),
-              keyboardType: TextInputType.phone,
-              maxLength: 15,
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-              maxLength: 50,
-            ),
-            TextField(
-              controller: _addressController,
-              decoration: const InputDecoration(labelText: 'Address'),
-              keyboardType: TextInputType.text,
-              maxLength: 100,
-            ),
-            TextField(
-              controller: _remarksController,
-              decoration: const InputDecoration(labelText: 'Remarks'),
-              keyboardType: TextInputType.text,
-              maxLength: 200,
-            ),
-            const SizedBox(height: 10),
-            
-            // Badminton Level Range Slider
-            const Text(
-              'Badminton Level Range',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.amber.withOpacity(0.3)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'From: ${_getDisplayText(_levelRange.start)}',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _nicknameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nickname *',
+                    border: OutlineInputBorder(),
                   ),
-                  Text(
-                    'To: ${_getDisplayText(_levelRange.end)}',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                  keyboardType: TextInputType.text,
+                  maxLength: 30,
+                  validator: (value) => _validateRequired(value, 'Nickname'),
+                ),
+                const SizedBox(height: 10),
+                
+                TextFormField(
+                  controller: _fullNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name *',
+                    border: OutlineInputBorder(),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            
-            RangeSlider(
-              values: _levelRange,
-              min: 0,
-              max: maxValue,
-              divisions: maxValue.toInt(),
-              activeColor: Colors.amber,
-              inactiveColor: Colors.amber.withOpacity(0.3),
-              labels: RangeLabels(
-                _getDisplayText(_levelRange.start),
-                _getDisplayText(_levelRange.end),
-              ),
-              onChanged: (RangeValues values) {
-                setState(() {
-                  _levelRange = values;
-                });
-              },
-            ),
-            
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Beginners', style: TextStyle(fontSize: 12)),
-                  Text('Intermediate', style: TextStyle(fontSize: 12)),
-                  Text('Level G', style: TextStyle(fontSize: 12)),
-                  Text('Level F', style: TextStyle(fontSize: 12)),
-                  Text('Level E', style: TextStyle(fontSize: 12)),
-                  Text('Level D', style: TextStyle(fontSize: 12)),
-                  Text('Open', style: TextStyle(fontSize: 12)),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 30),
-            
-            // Action buttons - conditional based on mode
-            if (isEditMode)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: _submitPlayerData,
-                    child: const Text('Update Player'),
+                  keyboardType: TextInputType.text,
+                  maxLength: 50,
+                  validator: (value) => _validateRequired(value, 'Full Name'),
+                ),
+                const SizedBox(height: 10),
+                
+                TextFormField(
+                  controller: _contactController,
+                  decoration: const InputDecoration(
+                    labelText: 'Contact Number *',
+                    border: OutlineInputBorder(),
+                    hintText: '+1234567890',
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                  keyboardType: TextInputType.phone,
+                  maxLength: 15,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[\d\+\-\(\)\s]')),
+                  ],
+                  validator: _validatePhoneNumber,
+                ),
+                const SizedBox(height: 10),
+                
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email *',
+                    border: OutlineInputBorder(),
+                    hintText: 'example@email.com',
                   ),
-                  if (widget.onDeletePlayer != null)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                  keyboardType: TextInputType.emailAddress,
+                  maxLength: 50,
+                  validator: _validateEmail,
+                ),
+                const SizedBox(height: 10),
+                
+                TextFormField(
+                  controller: _addressController,
+                  decoration: const InputDecoration(
+                    labelText: 'Address *',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 2,
+                  maxLength: 100,
+                  validator: (value) => _validateRequired(value, 'Address'),
+                ),
+                const SizedBox(height: 10),
+                
+                TextFormField(
+                  controller: _remarksController,
+                  decoration: const InputDecoration(
+                    labelText: 'Remarks',
+                    border: OutlineInputBorder(),
+                    helperText: 'Optional',
+                  ),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 2,
+                  maxLength: 200,
+                ),
+                const SizedBox(height: 20),
+                
+                const Text(
+                  'Badminton Level Range',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'From: ${_getDisplayText(_levelRange.start)}',
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
-                      onPressed: _deletePlayer,
-                      child: const Text('Delete'),
-                    ),
-                ],
-              )
-            else
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: _submitPlayerData,
-                    child: const Text('Add Player'),
+                      Text(
+                        'To: ${_getDisplayText(_levelRange.end)}',
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                ),
+                const SizedBox(height: 10),
+                
+                RangeSlider(
+                  values: _levelRange,
+                  min: 0,
+                  max: maxValue,
+                  divisions: maxValue.toInt(),
+                  activeColor: Colors.amber,
+                  inactiveColor: Colors.amber.withOpacity(0.3),
+                  labels: RangeLabels(
+                    _getDisplayText(_levelRange.start),
+                    _getDisplayText(_levelRange.end),
                   ),
-                ],
-              ),
-          ],
+                  onChanged: (RangeValues values) {
+                    setState(() {
+                      _levelRange = values;
+                    });
+                  },
+                ),
+                
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Beginners', style: TextStyle(fontSize: 12)),
+                      Text('Intermediate', style: TextStyle(fontSize: 12)),
+                      Text('Level G', style: TextStyle(fontSize: 12)),
+                      Text('Level F', style: TextStyle(fontSize: 12)),
+                      Text('Level E', style: TextStyle(fontSize: 12)),
+                      Text('Level D', style: TextStyle(fontSize: 12)),
+                      Text('Open', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 30),
+                
+                const Row(
+                  children: [
+                    Text(
+                      '* Required fields',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                if (isEditMode)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                        onPressed: _submitPlayerData,
+                        child: const Text('Update Player'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      if (widget.onDeletePlayer != null)
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          onPressed: _deletePlayer,
+                          child: const Text('Delete'),
+                        ),
+                    ],
+                  )
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                        onPressed: _submitPlayerData,
+                        child: const Text('Add Player'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
