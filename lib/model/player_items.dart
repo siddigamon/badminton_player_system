@@ -64,7 +64,6 @@ class PlayerItem {
     return formatter.format(dateJoined);
   }
 
-  // Helper method to get level display for any level
   String _getLevelDisplayText(BadmintonLevel level) {
     switch (level) {
       case BadmintonLevel.beginners:
@@ -84,7 +83,6 @@ class PlayerItem {
     }
   }
 
-  // Helper method to get strength display for any strength
   String _getStrengthDisplayText(LevelStrength strength) {
     switch (strength) {
       case LevelStrength.weak:
