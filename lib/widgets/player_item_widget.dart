@@ -11,11 +11,11 @@ class PlayerItemWidget extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 1.0),
+        margin: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 1.0),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2.0), 
+          borderRadius: BorderRadius.circular(2.0),
         ),
-        elevation: 2.0, 
+        elevation: 2.0,
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Column(
@@ -30,7 +30,7 @@ class PlayerItemWidget extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                  '${playerItem.fullName} • ${playerItem.rangeDescription}',
+                '${playerItem.fullName} • ${playerItem.rangeDescription}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.blueGrey,
