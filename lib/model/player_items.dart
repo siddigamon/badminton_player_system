@@ -103,21 +103,3 @@ class PlayerItem {
     return '$startStrength $startLevel, $endStrength $endLevel';
   }
 }
-
-class PlayerBucket {
-  final BadmintonLevel level;
-  final List<PlayerItem> players;
-
-  PlayerBucket({required this.level, required this.players});
-
-  PlayerBucket.forLevel(List<PlayerItem> allPlayers, this.level)
-    : players = allPlayers.where((player) => player.level == level).toList();
-
-  int get totalPlayers {
-    return players.length;
-  }
-
-  List<PlayerItem> getPlayersByStrength(LevelStrength strength) {
-    return players.where((player) => player.strength == strength).toList();
-  }
-}
