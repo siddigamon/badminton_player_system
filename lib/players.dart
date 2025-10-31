@@ -3,6 +3,9 @@ import 'package:badminton_player_system/model/player_items.dart';
 import 'package:badminton_player_system/new_player.dart';
 import 'package:badminton_player_system/widgets/player_item_widget.dart';
 import 'package:badminton_player_system/edit_player.dart';
+import 'package:badminton_player_system/add_game_screen.dart';
+import 'package:badminton_player_system/all_games_screen.dart';
+import 'package:badminton_player_system/user_settings_screen.dart';
 
 class Players extends StatefulWidget {
   const Players({super.key});
@@ -13,6 +16,8 @@ class Players extends StatefulWidget {
 
 class _PlayersState extends State<Players> {
   final TextEditingController _searchController = TextEditingController();
+  int _selectedIndex = 0; // 0 = Players (default), 1 = Add Game, 2 = All Games, 3 = Settings
+  
   List<PlayerItem> playerItems = [
     PlayerItem(
       nickname: 'AcePlayer',
@@ -43,7 +48,6 @@ class _PlayersState extends State<Players> {
       rangeStartStrength: LevelStrength.weak,
       rangeEndLevel: BadmintonLevel.intermediate,
       rangeEndStrength: LevelStrength.mid,
-
     ),
     PlayerItem(
       nickname: 'ProShuttle',
@@ -59,7 +63,6 @@ class _PlayersState extends State<Players> {
       rangeStartStrength: LevelStrength.mid,
       rangeEndLevel: BadmintonLevel.levelD,
       rangeEndStrength: LevelStrength.strong,
-
     ),
   ];
 
@@ -80,6 +83,12 @@ class _PlayersState extends State<Players> {
     super.dispose();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   void _showAddPlayer() {
     showModalBottomSheet(
       useSafeArea: true,
@@ -96,19 +105,18 @@ class _PlayersState extends State<Players> {
   }
 
   void _editPlayer(PlayerItem player) {
-  showModalBottomSheet(
-    useSafeArea: true,
-    isScrollControlled: true,
-    context: context,
-    builder: (ctx) => EditPlayer(
-      player: player,
-      onUpdatePlayer: _updatePlayerItem,
-      onDeletePlayer: _deletePlayerItem,
-    ),
-  );
-}
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (ctx) => EditPlayer(
+        player: player,
+        onUpdatePlayer: _updatePlayerItem,
+        onDeletePlayer: _deletePlayerItem,
+      ),
+    );
+  }
 
-  
   void _updatePlayerItem(PlayerItem updatedPlayer) {
     setState(() {
       final index = playerItems.indexWhere((p) => p.dateJoined == updatedPlayer.dateJoined);
@@ -142,14 +150,14 @@ class _PlayersState extends State<Players> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildPlayersScreen() {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'All Players',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
+        automaticallyImplyLeading: false,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -295,6 +303,48 @@ class _PlayersState extends State<Players> {
                     },
                   ),
                 ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Define the screens for navigation
+    final List<Widget> screens = [
+      _buildPlayersScreen(),      // Index 0 - Players screen (default)
+      const AddGameScreen(),      // Index 1 - Add Game screen
+      const AllGamesScreen(),     // Index 2 - All Games screen
+      const UserSettingsScreen(), // Index 3 - Settings screen
+    ];
+
+    return Scaffold(
+      body: screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.amber,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        elevation: 8,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Players',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle),
+            label: 'Add Game',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'All Games',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
       ),
     );
