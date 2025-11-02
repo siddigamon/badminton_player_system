@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:badminton_player_system/model/user_settings.dart';
 
 class UserSettingsScreen extends StatefulWidget {
   const UserSettingsScreen({super.key});
@@ -19,25 +20,10 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
   // Checkbox state
   bool _divideCourtEqually = true;
 
-  // Static variables to store values across navigation
-  static String _savedCourtName = 'Badminton Court 1';
-  static String _savedCourtRate = '50.00';
-  static String _savedShuttleCockPrice = '15.00';
-  static bool _savedDivideCourtEqually = true;
-  static bool _hasBeenInitialized = false;
-
   @override
   void initState() {
     super.initState();
     _loadUserSettings();
-  }
-
-  // Load settings from static variables (preserved across navigation)
-  void _loadUserSettings() {
-    _courtNameController.text = _savedCourtName;
-    _courtRateController.text = _savedCourtRate;
-    _shuttleCockPriceController.text = _savedShuttleCockPrice;
-    _divideCourtEqually = _savedDivideCourtEqually;
   }
 
   @override
@@ -48,7 +34,15 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     super.dispose();
   }
 
-  // Save settings to static variables
+  // Load existing settings from UserSettings class
+  void _loadUserSettings() {
+    _courtNameController.text = UserSettings.defaultCourtName;
+    _courtRateController.text = UserSettings.defaultCourtRate.toString();
+    _shuttleCockPriceController.text = UserSettings.defaultShuttleCockPrice.toString();
+    _divideCourtEqually = UserSettings.defaultDivideCourtEqually;
+  }
+
+  // Save settings to UserSettings class
   void _saveUserSettings() {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,11 +54,11 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
       return;
     }
 
-    // Save to static variables (preserved in memory)
-    _savedCourtName = _courtNameController.text;
-    _savedCourtRate = _courtRateController.text;
-    _savedShuttleCockPrice = _shuttleCockPriceController.text;
-    _savedDivideCourtEqually = _divideCourtEqually;
+    // Save to UserSettings class
+    UserSettings.updateCourtName(_courtNameController.text);
+    UserSettings.updateCourtRate(_courtRateController.text);
+    UserSettings.updateShuttleCockPrice(_shuttleCockPriceController.text);
+    UserSettings.updateDivideCourtEqually(_divideCourtEqually);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -73,7 +67,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
       ),
     );
   }
-
 
   // Reset settings to default
   void _resetToDefaults() {
@@ -95,12 +88,12 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 _shuttleCockPriceController.text = '15.00';
                 _divideCourtEqually = true;
               });
-
-              // Also reset the static variables
-              _savedCourtName = 'Badminton Court 1';
-              _savedCourtRate = '50.00';
-              _savedShuttleCockPrice = '15.00';
-              _savedDivideCourtEqually = true;
+              
+              // Reset UserSettings
+              UserSettings.updateCourtName('Badminton Court 1');
+              UserSettings.updateCourtRate('50.00');
+              UserSettings.updateShuttleCockPrice('15.00');
+              UserSettings.updateDivideCourtEqually(true);
               
               Navigator.of(ctx).pop();
               ScaffoldMessenger.of(context).showSnackBar(
