@@ -278,33 +278,39 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.amber.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              '${game.numberOfPlayers} players',
+                                          if (game.divideCourtEqually && game.actualPlayerCount > 0) ...[
+                                            Text(
+                                              '₱${game.costPerPlayer.toStringAsFixed(2)}',
                                               style: const TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.amber,
+                                                color: Colors.green,
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '₱${game.totalCost.toStringAsFixed(2)}',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green,
+                                            const Text(
+                                              'per player',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
+                                          ] else ...[
+                                            Text(
+                                              '₱${game.totalCost.toStringAsFixed(2)}',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green,
+                                              ),
+                                            ),
+                                            const Text(
+                                              'total cost',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
                                         ],
                                       ),
                                     ],

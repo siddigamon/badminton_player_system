@@ -25,17 +25,47 @@ class GameItem {
     this.queuedPlayers,
   });
 
-  // Calculate total cost
+  // Calculate TOTAL cost for the entire game (always the same regardless of division method)
   double get totalCost {
     double courtCost = 0;
     for (var schedule in schedules) {
-      if (divideCourtEqually && numberOfPlayers > 0) {
-        courtCost += (courtRate * schedule.durationInHours) / numberOfPlayers;
-      } else {
-        courtCost += courtRate * schedule.durationInHours;
-      }
+      courtCost += courtRate * schedule.durationInHours;
     }
     return courtCost + shuttleCockPrice;
+  }
+
+  // Get actual number of players (from queued players if available, otherwise numberOfPlayers)
+  int get actualPlayerCount {
+    return queuedPlayers?.length ?? numberOfPlayers;
+  }
+
+  // Calculate cost per player based on division method
+  double get costPerPlayer {
+    if (divideCourtEqually && actualPlayerCount > 0) {
+      // Divide total cost equally among all players
+      return totalCost / actualPlayerCount;
+    } else {
+      // Individual payment - each player pays full cost or their portion
+      return totalCost;
+    }
+  }
+
+  // Display text for cost information
+  String get costDisplayText {
+    if (divideCourtEqually && actualPlayerCount > 0) {
+      return '₱${costPerPlayer.toStringAsFixed(2)} per player (₱${totalCost.toStringAsFixed(2)} total)';
+    } else if (divideCourtEqually && actualPlayerCount == 0) {
+      return '₱${totalCost.toStringAsFixed(2)} total (to be split equally)';
+    } else {
+      return '₱${totalCost.toStringAsFixed(2)} total (individual payment)';
+    }
+  }
+
+  // Payment method description
+  String get paymentMethodDescription {
+    return divideCourtEqually 
+        ? 'Cost shared equally among players'
+        : 'Individual payment based on usage';
   }
 
   // Get display title (game title or formatted date if title is empty)

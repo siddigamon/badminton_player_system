@@ -224,65 +224,117 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                     _buildDetailRow('Cost Distribution', 
                         _game.divideCourtEqually ? 'Split equally' : 'Individual payment'),
                     _buildDetailRow('Total Cost', '₱${_game.totalCost.toStringAsFixed(2)}'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Schedules Card
-            Card(
-              elevation: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.schedule, color: Colors.blue, size: 24),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Schedules',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 8),
                     
-                    if (_game.schedules.isEmpty)
-                      const Text('No schedules added', style: TextStyle(color: Colors.grey))
-                    else
-                      ..._game.schedules.map((schedule) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
+                    // ADD THIS COST BREAKDOWN SECTION:
+                    const SizedBox(height: 16),
+                    if (_game.divideCourtEqually && _game.actualPlayerCount > 0) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'Court ${schedule.courtNumber}',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
+                            Row(
+                              children: [
+                                const Icon(Icons.monetization_on, color: Colors.green, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Cost Per Player',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '${_formatDate(schedule.startTime)} • ${_formatTime(schedule.startTime)} - ${_formatTime(schedule.endTime)}',
-                                style: const TextStyle(fontSize: 14),
+                            const SizedBox(height: 8),
+                            Text(
+                              '₱${_game.costPerPlayer.toStringAsFixed(2)} each',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
                               ),
                             ),
                             Text(
-                              '${schedule.durationInHours.toStringAsFixed(1)}h',
-                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                              'Total: ₱${_game.totalCost.toStringAsFixed(2)} ÷ ${_game.actualPlayerCount} players',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),
-                      )).toList(),
+                      ),
+                    ] else if (!_game.divideCourtEqually) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.person, color: Colors.blue, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Individual Payment',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Players pay based on their individual usage',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (_game.divideCourtEqually && _game.actualPlayerCount == 0) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.info, color: Colors.orange, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Waiting for Players',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Cost will be split equally once players join (₱${_game.totalCost.toStringAsFixed(2)} total)',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -388,7 +440,21 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                                   player.fullName,
                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                subtitle: Text('${player.nickname} • ${player.level.name}'),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('${player.nickname} • ${player.level.name}'),
+                                    if (_game.divideCourtEqually && _game.actualPlayerCount > 0)
+                                      Text(
+                                        'Owes: ₱${_game.costPerPlayer.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.remove_circle, color: Colors.red),
                                   onPressed: () => _removePlayerFromQueue(player),
@@ -430,6 +496,63 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                                 color: Colors.green[700],
                               ),
                             ),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    if (_queuedPlayers.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'Payment Summary',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (_game.divideCourtEqually) ...[
+                              Text(
+                                'Each player pays: ₱${_game.costPerPlayer.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              Text(
+                                'Total collected: ₱${(_game.costPerPlayer * _game.actualPlayerCount).toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ] else ...[
+                              const Text(
+                                'Individual payment method',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              Text(
+                                'Total game cost: ₱${_game.totalCost.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
