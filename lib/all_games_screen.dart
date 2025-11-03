@@ -1,3 +1,5 @@
+import 'package:badminton_player_system/model/player_items.dart';
+import 'package:badminton_player_system/view_game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:badminton_player_system/model/game_item.dart';
 
@@ -5,12 +7,14 @@ class AllGamesScreen extends StatefulWidget {
   final List<GameItem> games;
   final Function(GameItem) onGameDeleted;
   final VoidCallback onNavigateToAddGame;
+  final List<PlayerItem> availablePlayers;
 
   const AllGamesScreen({
     super.key,
     required this.games,
     required this.onGameDeleted,
     required this.onNavigateToAddGame,
+    required this.availablePlayers,
   });
 
   @override
@@ -218,11 +222,20 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                         },
                         child: GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to View Game screen (future requirement)
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Tapped on ${game.displayTitle}'),
-                                duration: const Duration(seconds: 1),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ViewGameScreen(
+                                  game: game,
+                                  availablePlayers: widget.availablePlayers, // This needs to be passed from AllGamesScreen
+                                  onGameUpdated: (updatedGame) {
+                                    widget.onGameDeleted(game); // Remove old version
+                                    // Add updated version - this will be handled by the parent
+                                    setState(() {
+                                      // Refresh the UI
+                                    });
+                                  },
+                                ),
                               ),
                             );
                           },

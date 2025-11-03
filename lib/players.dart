@@ -341,8 +341,9 @@ class _PlayersState extends State<Players> {
       games: GameData.gameItems,
       onGameDeleted: _deleteGameItem,
       onNavigateToAddGame: _navigateToAddGame,
+      availablePlayers: playerItems,
     ),     // Index 2 - All Games screen
-      UserSettingsScreen(), // Index 3 - Settings screen
+      const UserSettingsScreen(), // Index 3 - Settings screen
     ];
 
     return Scaffold(

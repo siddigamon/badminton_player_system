@@ -1,3 +1,5 @@
+import 'package:badminton_player_system/model/player_items.dart';
+
 class GameItem {
   final String id;
   final String gameTitle;
@@ -8,6 +10,7 @@ class GameItem {
   final bool divideCourtEqually;
   final DateTime createdDate;
   final int numberOfPlayers;
+  final List<PlayerItem>? queuedPlayers;
 
   GameItem({
     required this.id,
@@ -19,6 +22,7 @@ class GameItem {
     required this.divideCourtEqually,
     required this.createdDate,
     this.numberOfPlayers = 0,
+    this.queuedPlayers,
   });
 
   // Calculate total cost
