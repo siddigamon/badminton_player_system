@@ -4,13 +4,13 @@ class UserSettings {
   static String _savedShuttleCockPrice = '15.00';
   static bool _savedDivideCourtEqually = true;
 
-  // Getters to access settings from other screens
+  // Getters
   static String get defaultCourtName => _savedCourtName;
   static double get defaultCourtRate => double.tryParse(_savedCourtRate) ?? 50.0;
   static double get defaultShuttleCockPrice => double.tryParse(_savedShuttleCockPrice) ?? 15.0;
   static bool get defaultDivideCourtEqually => _savedDivideCourtEqually;
 
-  // Setters to update settings
+  // Setters 
   static void updateCourtName(String value) => _savedCourtName = value;
   static void updateCourtRate(String value) => _savedCourtRate = value;
   static void updateShuttleCockPrice(String value) => _savedShuttleCockPrice = value;

@@ -14,13 +14,11 @@ class AddGameScreen extends StatefulWidget {
 class _AddGameScreenState extends State<AddGameScreen> {
   final _formKey = GlobalKey<FormState>();
   
-  // Form controllers
   final TextEditingController _gameTitleController = TextEditingController();
   final TextEditingController _courtNameController = TextEditingController();
   final TextEditingController _courtRateController = TextEditingController();
   final TextEditingController _shuttleCockPriceController = TextEditingController();
   
-  // Game data
   bool _divideCourtEqually = true;
   List<GameSchedule> _schedules = [];
 
@@ -39,7 +37,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
     super.dispose();
   }
 
-  // Load default values from User Settings
   void _loadDefaultSettings() {
     _courtNameController.text = UserSettings.defaultCourtName;
     _courtRateController.text = UserSettings.defaultCourtRate.toString();
@@ -47,7 +44,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
     _divideCourtEqually = UserSettings.defaultDivideCourtEqually;
   }
 
-  // Add a new schedule
   void _addSchedule() {
     showDialog(
       context: context,
@@ -61,7 +57,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
     );
   }
 
-  // Edit an existing schedule
   void _editSchedule(int index) {
     showDialog(
       context: context,
@@ -76,14 +71,12 @@ class _AddGameScreenState extends State<AddGameScreen> {
     );
   }
 
-  // Remove a schedule
   void _removeSchedule(int index) {
     setState(() {
       _schedules.removeAt(index);
     });
   }
 
-  // Save the game
   void _saveGame() {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +98,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
       return;
     }
 
-    // Create the game item
     final game = GameItem(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       gameTitle: _gameTitleController.text.trim(),
@@ -117,7 +109,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
       createdDate: DateTime.now(),
     );
 
-    // TODO: Save to persistent storage or pass back to parent
     print('Game saved: ${game.displayTitle}');
     print('Court: ${game.courtName}');
     print('Schedules: ${game.schedules.length}');
@@ -125,7 +116,6 @@ class _AddGameScreenState extends State<AddGameScreen> {
     print('Shuttle Price: ${game.shuttleCockPrice}');
     print('Divide Equally: ${game.divideCourtEqually}');
 
-    // Save the game using the callback
     if (widget.onGameAdded != null) {
       widget.onGameAdded!(game);
     }
@@ -137,12 +127,10 @@ class _AddGameScreenState extends State<AddGameScreen> {
       ),
     );
 
-    // Clear form after successful save
     _clearForm();
   }
 
-  // Cancel and go back
-  // Cancel - clear the form
+  
 void _cancelGame() {
   if (_hasUnsavedChanges()) {
     showDialog(
@@ -173,7 +161,6 @@ void _cancelGame() {
       ),
     );
   } else {
-    // No changes, just show a message or clear form
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Form cleared'),
@@ -184,7 +171,6 @@ void _cancelGame() {
   }
 }
 
-  // Check if there are unsaved changes
   bool _hasUnsavedChanges() {
     return _gameTitleController.text.isNotEmpty ||
            _courtNameController.text != UserSettings.defaultCourtName ||
@@ -194,7 +180,6 @@ void _cancelGame() {
            _schedules.isNotEmpty;
   }
 
-  // Clear the form
   void _clearForm() {
     _gameTitleController.clear();
     _loadDefaultSettings();
@@ -203,7 +188,6 @@ void _cancelGame() {
     });
   }
 
-  // Validation methods
   String? _validateRequired(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';
@@ -624,7 +608,6 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
     if (time != null) {
       setState(() {
         _startTime = time;
-        // Auto-adjust end time if it's before start time
         if (_endTime.hour < _startTime.hour || 
             (_endTime.hour == _startTime.hour && _endTime.minute <= _startTime.minute)) {
           _endTime = TimeOfDay(hour: (_startTime.hour + 1) % 24, minute: _startTime.minute);
@@ -648,7 +631,6 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
   void _saveSchedule() {
     if (!_formKey.currentState!.validate()) return;
 
-    // Create DateTime objects
     final startDateTime = DateTime(
       _selectedDate.year,
       _selectedDate.month,
@@ -665,7 +647,6 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
       _endTime.minute,
     );
 
-    // Validation
     if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

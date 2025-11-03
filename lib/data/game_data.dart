@@ -1,9 +1,7 @@
 import '../model/game_item.dart';
 
 class GameData {
-  // Static list of games (following same pattern as your players)
   static List<GameItem> gameItems = [
-    // Sample games for demo
     GameItem(
       id: '1',
       gameTitle: 'Weekend Tournament',
@@ -40,7 +38,7 @@ class GameData {
     ),
     GameItem(
       id: '3',
-      gameTitle: '', // Empty title - will use date as title
+      gameTitle: '', 
       courtName: 'Badminton Court 1',
       schedules: [
         GameSchedule(
@@ -57,7 +55,6 @@ class GameData {
     ),
   ];
 
-  // Helper methods to manage the games list
   static void addGame(GameItem game) {
     gameItems.add(game);
   }
@@ -73,15 +70,5 @@ class GameData {
     }
   }
 
-  // Get game by ID
-  static GameItem? getGameById(String id) {
-    try {
-      return gameItems.firstWhere((game) => game.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Get total number of games
   static int get totalGames => gameItems.length;
 }

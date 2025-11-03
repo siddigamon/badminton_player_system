@@ -30,40 +30,33 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
     super.dispose();
   }
 
-  // Filter games by name or date
   List<GameItem> get filteredGames {
     if (_searchController.text.isEmpty) {
       return widget.games;
     }
     final searchTerm = _searchController.text.toLowerCase();
     return widget.games.where((game) {
-      // Search by game title
       final titleMatch = game.displayTitle.toLowerCase().contains(searchTerm);
       
-      // Search by date
       final dateString = game.schedules.isNotEmpty 
           ? '${game.schedules.first.startTime.day}/${game.schedules.first.startTime.month}/${game.schedules.first.startTime.year}'
           : '';
       final dateMatch = dateString.contains(searchTerm);
       
-      // Search by court name
       final courtMatch = game.courtName.toLowerCase().contains(searchTerm);
       
       return titleMatch || dateMatch || courtMatch;
     }).toList();
   }
 
-  // Format date for display
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  // Format time for display
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  // Get schedule display text
   String _getScheduleDisplay(GameItem game) {
     if (game.schedules.isEmpty) return 'No schedule';
     
@@ -227,12 +220,10 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                               MaterialPageRoute(
                                 builder: (context) => ViewGameScreen(
                                   game: game,
-                                  availablePlayers: widget.availablePlayers, // This needs to be passed from AllGamesScreen
+                                  availablePlayers: widget.availablePlayers, 
                                   onGameUpdated: (updatedGame) {
-                                    widget.onGameDeleted(game); // Remove old version
-                                    // Add updated version - this will be handled by the parent
+                                    widget.onGameDeleted(game); 
                                     setState(() {
-                                      // Refresh the UI
                                     });
                                   },
                                 ),

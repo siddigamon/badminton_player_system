@@ -12,12 +12,10 @@ class UserSettingsScreen extends StatefulWidget {
 class _UserSettingsScreenState extends State<UserSettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   
-  // Form controllers
   final TextEditingController _courtNameController = TextEditingController();
   final TextEditingController _courtRateController = TextEditingController();
   final TextEditingController _shuttleCockPriceController = TextEditingController();
   
-  // Checkbox state
   bool _divideCourtEqually = true;
 
   @override
@@ -34,7 +32,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     super.dispose();
   }
 
-  // Load existing settings from UserSettings class
   void _loadUserSettings() {
     _courtNameController.text = UserSettings.defaultCourtName;
     _courtRateController.text = UserSettings.defaultCourtRate.toString();
@@ -42,7 +39,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     _divideCourtEqually = UserSettings.defaultDivideCourtEqually;
   }
 
-  // Save settings to UserSettings class
   void _saveUserSettings() {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +50,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
       return;
     }
 
-    // Save to UserSettings class
     UserSettings.updateCourtName(_courtNameController.text);
     UserSettings.updateCourtRate(_courtRateController.text);
     UserSettings.updateShuttleCockPrice(_shuttleCockPriceController.text);
@@ -68,7 +63,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     );
   }
 
-  // Reset settings to default
   void _resetToDefaults() {
     showDialog(
       context: context,
@@ -89,7 +83,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 _divideCourtEqually = true;
               });
               
-              // Reset UserSettings
               UserSettings.updateCourtName('Badminton Court 1');
               UserSettings.updateCourtRate('50.00');
               UserSettings.updateShuttleCockPrice('15.00');
@@ -111,7 +104,6 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     );
   }
 
-  // Validation methods
   String? _validateRequired(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';

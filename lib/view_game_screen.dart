@@ -27,11 +27,9 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
   void initState() {
     super.initState();
     _game = widget.game;
-    // Initialize with existing queued players if any
     _queuedPlayers = List.from(_game.queuedPlayers ?? []);
   }
 
-  // Add player to queue
   void _addPlayerToQueue(PlayerItem player) {
     if (_queuedPlayers.length >= 4) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +64,6 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
     );
   }
 
-  // Remove player from queue
   void _removePlayerFromQueue(PlayerItem player) {
     setState(() {
       _queuedPlayers.removeWhere((p) => p.fullName == player.fullName);
@@ -81,7 +78,6 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
     );
   }
 
-  // Update game with current queue
   void _updateGameWithQueue() {
     _game = GameItem(
       id: _game.id,
@@ -96,22 +92,18 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
       queuedPlayers: _queuedPlayers,
     );
     
-    // Update in GameData
     GameData.updateGame(_game);
     widget.onGameUpdated(_game);
   }
 
-  // Format date for display
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  // Format time for display
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  // Show add player dialog
   void _showAddPlayerDialog() {
     final availableToAdd = widget.availablePlayers
         .where((player) => !_queuedPlayers.any((qp) => qp.fullName == player.fullName))
@@ -225,7 +217,6 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                         _game.divideCourtEqually ? 'Split equally' : 'Individual payment'),
                     _buildDetailRow('Total Cost', '₱${_game.totalCost.toStringAsFixed(2)}'),
                     
-                    // ADD THIS COST BREAKDOWN SECTION:
                     const SizedBox(height: 16),
                     if (_game.divideCourtEqually && _game.actualPlayerCount > 0) ...[
                       Container(

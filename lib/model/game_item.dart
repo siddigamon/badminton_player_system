@@ -25,7 +25,6 @@ class GameItem {
     this.queuedPlayers,
   });
 
-  // Calculate TOTAL cost for the entire game (always the same regardless of division method)
   double get totalCost {
     double courtCost = 0;
     for (var schedule in schedules) {
@@ -34,23 +33,21 @@ class GameItem {
     return courtCost + shuttleCockPrice;
   }
 
-  // Get actual number of players (from queued players if available, otherwise numberOfPlayers)
+  // Get actual number of players 
   int get actualPlayerCount {
     return queuedPlayers?.length ?? numberOfPlayers;
   }
 
-  // Calculate cost per player based on division method
   double get costPerPlayer {
     if (divideCourtEqually && actualPlayerCount > 0) {
       // Divide total cost equally among all players
       return totalCost / actualPlayerCount;
     } else {
-      // Individual payment - each player pays full cost or their portion
+      // Individual payment
       return totalCost;
     }
   }
 
-  // Display text for cost information
   String get costDisplayText {
     if (divideCourtEqually && actualPlayerCount > 0) {
       return '₱${costPerPlayer.toStringAsFixed(2)} per player (₱${totalCost.toStringAsFixed(2)} total)';
@@ -61,14 +58,12 @@ class GameItem {
     }
   }
 
-  // Payment method description
   String get paymentMethodDescription {
     return divideCourtEqually 
         ? 'Cost shared equally among players'
         : 'Individual payment based on usage';
   }
 
-  // Get display title (game title or formatted date if title is empty)
   String get displayTitle {
     if (gameTitle.isNotEmpty) {
       return gameTitle;
@@ -92,13 +87,12 @@ class GameSchedule {
     required this.endTime,
   });
 
-  // Calculate duration in hours
+  // duration in hours
   double get durationInHours {
     final duration = endTime.difference(startTime);
     return duration.inMinutes / 60.0;
   }
 
-  // Format schedule display
   String get displayText {
     final startTimeText = '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
     final endTimeText = '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}';
