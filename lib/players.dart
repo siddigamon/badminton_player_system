@@ -6,6 +6,10 @@ import 'package:badminton_player_system/edit_player.dart';
 import 'package:badminton_player_system/add_game_screen.dart';
 import 'package:badminton_player_system/all_games_screen.dart';
 import 'package:badminton_player_system/user_settings_screen.dart';
+import 'package:badminton_player_system/data/game_data.dart'; 
+import 'package:badminton_player_system/model/game_item.dart'; 
+
+
 
 class Players extends StatefulWidget {
   const Players({super.key});
@@ -148,6 +152,25 @@ class _PlayersState extends State<Players> {
         ),
       ),
     );
+  }
+
+  // NEW: Game management methods (using GameData)
+  void _addGameItem(GameItem game) {
+    setState(() {
+      GameData.addGame(game);
+    });
+  }
+
+  void _deleteGameItem(GameItem gameToDelete) {
+    setState(() {
+      GameData.removeGame(gameToDelete);
+    });
+  }
+
+  void _navigateToAddGame() {
+    setState(() {
+      _selectedIndex = 1; // Add Game tab
+    });
   }
 
   Widget _buildPlayersScreen() {
@@ -313,9 +336,13 @@ class _PlayersState extends State<Players> {
     // Define the screens for navigation
     final List<Widget> screens = [
       _buildPlayersScreen(),      // Index 0 - Players screen (default)
-      const AddGameScreen(),      // Index 1 - Add Game screen
-      const AllGamesScreen(),     // Index 2 - All Games screen
-      const UserSettingsScreen(), // Index 3 - Settings screen
+      AddGameScreen(onGameAdded: _addGameItem),      // Index 1 - Add Game screen
+      AllGamesScreen(                           // Index 2 - All Games screen (with parameters)
+      games: GameData.gameItems,
+      onGameDeleted: _deleteGameItem,
+      onNavigateToAddGame: _navigateToAddGame,
+    ),     // Index 2 - All Games screen
+      UserSettingsScreen(), // Index 3 - Settings screen
     ];
 
     return Scaffold(

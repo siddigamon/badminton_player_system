@@ -4,7 +4,8 @@ import 'package:badminton_player_system/model/game_item.dart';
 import 'package:badminton_player_system/model/user_settings.dart';
 
 class AddGameScreen extends StatefulWidget {
-  const AddGameScreen({super.key});
+  final Function(GameItem)? onGameAdded;
+  const AddGameScreen({super.key, this.onGameAdded});
 
   @override
   State<AddGameScreen> createState() => _AddGameScreenState();
@@ -123,6 +124,11 @@ class _AddGameScreenState extends State<AddGameScreen> {
     print('Court Rate: ${game.courtRate}');
     print('Shuttle Price: ${game.shuttleCockPrice}');
     print('Divide Equally: ${game.divideCourtEqually}');
+
+    // Save the game using the callback
+    if (widget.onGameAdded != null) {
+      widget.onGameAdded!(game);
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
