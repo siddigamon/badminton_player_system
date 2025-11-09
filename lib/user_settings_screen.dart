@@ -273,50 +273,50 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 const SizedBox(height: 24),
 
                 // Information Card
-                Card(
-                  color: Colors.amber.withOpacity(0.1),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.info, color: Colors.amber),
-                            SizedBox(width: 8),
-                            Text(
-                              'About These Settings',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '• These values will be used as defaults when creating new games',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '• Court rate is typically divided among 4 players in doubles',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '• Shuttle cock cost can be shared or charged to one player',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '• You can always modify these values when creating individual games',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Card(
+                //   color: Colors.amber.withOpacity(0.1),
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(16.0),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         const Row(
+                //           children: [
+                //             Icon(Icons.info, color: Colors.amber),
+                //             SizedBox(width: 8),
+                //             Text(
+                //               'About These Settings',
+                //               style: TextStyle(
+                //                 fontWeight: FontWeight.bold,
+                //                 fontSize: 16,
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //         const SizedBox(height: 12),
+                //         const Text(
+                //           '• These values will be used as defaults when creating new games',
+                //           style: TextStyle(fontSize: 14),
+                //         ),
+                //         const SizedBox(height: 4),
+                //         const Text(
+                //           '• Court rate is typically divided among 4 players in doubles',
+                //           style: TextStyle(fontSize: 14),
+                //         ),
+                //         const SizedBox(height: 4),
+                //         const Text(
+                //           '• Shuttle cock cost can be shared or charged to one player',
+                //           style: TextStyle(fontSize: 14),
+                //         ),
+                //         const SizedBox(height: 4),
+                //         const Text(
+                //           '• You can always modify these values when creating individual games',
+                //           style: TextStyle(fontSize: 14),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 32),
 
                 // Action Buttons

@@ -231,12 +231,13 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                             );
                           },
                           child: Card(
-                            elevation: 2,
+                            margin: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 1.0),
+                            elevation: 2.0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(2.0),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(16.0),
+                              padding: const EdgeInsets.all(12.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -384,12 +385,12 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
       ),
       
       // Floating Action Button for Add Game
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.onNavigateToAddGame,
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: widget.onNavigateToAddGame,
+      //   backgroundColor: Colors.amber,
+      //   foregroundColor: Colors.white,
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }
