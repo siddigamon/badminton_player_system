@@ -263,7 +263,7 @@ void _cancelGame() {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         backgroundColor: Colors.amber,
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
         // actions: [
         //   IconButton(
         //     icon: const Icon(Icons.clear, color: Colors.white),

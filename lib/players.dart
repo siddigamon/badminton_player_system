@@ -159,6 +159,13 @@ class _PlayersState extends State<Players> {
     setState(() {
       GameData.addGame(game);
     });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${game.displayTitle} added successfully!'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _deleteGameItem(GameItem gameToDelete) {
@@ -168,9 +175,18 @@ class _PlayersState extends State<Players> {
   }
 
   void _navigateToAddGame() {
-    setState(() {
-      _selectedIndex = 1; // Add Game tab
-    });
+    // Instead of changing tabs, navigate to AddGameScreen as a separate screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddGameScreen(
+          onGameAdded: (game) {
+            _addGameItem(game);
+            Navigator.pop(context); // Return to All Games after adding
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildPlayersScreen() {
@@ -336,7 +352,7 @@ class _PlayersState extends State<Players> {
     // Define the screens for navigation
     final List<Widget> screens = [
       _buildPlayersScreen(),      // Index 0 - Players screen (default)
-      AddGameScreen(onGameAdded: _addGameItem),      // Index 1 - Add Game screen
+      // AddGameScreen(onGameAdded: _addGameItem),      // Index 1 - Add Game screen
       AllGamesScreen(                           // Index 2 - All Games screen (with parameters)
       games: GameData.gameItems,
       onGameDeleted: _deleteGameItem,
@@ -361,10 +377,10 @@ class _PlayersState extends State<Players> {
             icon: Icon(Icons.people),
             label: 'Players',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
-            label: 'Add Game',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.add_circle),
+          //   label: 'Add Game',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
             label: 'All Games',
