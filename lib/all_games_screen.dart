@@ -270,7 +270,8 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
-                                          if (game.divideCourtEqually && game.actualPlayerCount > 0) ...[
+                                          if (game.divideCourtEqually && game.divideShuttleEqually && game.actualPlayerCount > 0) ...[
+                                            // Both court and shuttle divided equally
                                             Text(
                                               '₱${game.costPerPlayer.toStringAsFixed(2)}',
                                               style: const TextStyle(
@@ -286,7 +287,32 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
                                                 color: Colors.grey,
                                               ),
                                             ),
+                                          ] else if (game.divideCourtEqually && !game.divideShuttleEqually && game.actualPlayerCount > 0) ...[
+                                            // Court divided, shuttle individual
+                                            Text(
+                                              '₱${game.courtCostPerPlayer.toStringAsFixed(2)}',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green,
+                                              ),
+                                            ),
+                                            const Text(
+                                              'per player',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            Text(
+                                              '+₱${game.shuttleCockPrice.toStringAsFixed(2)} shuttle',
+                                              style: const TextStyle(
+                                                fontSize: 9,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
                                           ] else ...[
+                                            // Individual payment or no players
                                             Text(
                                               '₱${game.totalCost.toStringAsFixed(2)}',
                                               style: const TextStyle(

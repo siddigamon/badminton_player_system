@@ -20,6 +20,8 @@ class _AddGameScreenState extends State<AddGameScreen> {
   final TextEditingController _shuttleCockPriceController = TextEditingController();
   
   bool _divideCourtEqually = true;
+  bool _divideShuttleEqually = true;
+
   List<GameSchedule> _schedules = [];
 
   @override
@@ -42,6 +44,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
     _courtRateController.text = UserSettings.defaultCourtRate.toString();
     _shuttleCockPriceController.text = UserSettings.defaultShuttleCockPrice.toString();
     _divideCourtEqually = UserSettings.defaultDivideCourtEqually;
+    _divideShuttleEqually = UserSettings.defaultDivideShuttleEqually;
   }
 
   void _addSchedule() {
@@ -106,7 +109,8 @@ class _AddGameScreenState extends State<AddGameScreen> {
       courtRate: double.parse(_courtRateController.text),
       shuttleCockPrice: double.parse(_shuttleCockPriceController.text),
       divideCourtEqually: _divideCourtEqually,
-      createdDate: DateTime.now(),
+      createdDate: DateTime.now(), 
+      divideShuttleEqually: _divideShuttleEqually,
     );
 
     print('Game saved: ${game.displayTitle}');
@@ -115,6 +119,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
     print('Court Rate: ${game.courtRate}');
     print('Shuttle Price: ${game.shuttleCockPrice}');
     print('Divide Equally: ${game.divideCourtEqually}');
+    print('Divide Shuttle Equally: ${game.divideShuttleEqually}');
 
     if (widget.onGameAdded != null) {
       widget.onGameAdded!(game);
@@ -214,6 +219,39 @@ void _cancelGame() {
     }
 
     return null;
+  }
+
+  Widget _buildCostPreview() {
+    final courtRate = double.tryParse(_courtRateController.text) ?? 0.0;
+    final shuttlePrice = double.tryParse(_shuttleCockPriceController.text) ?? 0.0;
+    final estimatedHours = 2.0; // Assume 2 hours for preview
+    final totalCourtCost = courtRate * estimatedHours;
+    final totalCost = totalCourtCost + shuttlePrice;
+    
+    if (_divideCourtEqually && _divideShuttleEqually) {
+      final perPlayer = totalCost / 4;
+      return Text('Each player pays: ₱${perPlayer.toStringAsFixed(2)}');
+    } else if (_divideCourtEqually && !_divideShuttleEqually) {
+      final courtPerPlayer = totalCourtCost / 4;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Each player pays: ₱${courtPerPlayer.toStringAsFixed(2)} (court)'),
+          Text('One player pays: ₱${shuttlePrice.toStringAsFixed(2)} (shuttle)'),
+        ],
+      );
+    } else if (!_divideCourtEqually && _divideShuttleEqually) {
+      final shuttlePerPlayer = shuttlePrice / 4;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Court cost: Individual payment'),
+          Text('Each player pays: ₱${shuttlePerPlayer.toStringAsFixed(2)} (shuttle)'),
+        ],
+      );
+    } else {
+      return const Text('All costs: Individual payment');
+    }
   }
 
   @override
@@ -477,6 +515,44 @@ void _cancelGame() {
                             });
                           },
                           contentPadding: EdgeInsets.zero,
+                        ),
+                        CheckboxListTile(
+                          title: const Text('Divide shuttle cost equally among players'),
+                          subtitle: Text(
+                            _divideShuttleEqually 
+                                ? 'Shuttle cost will be split equally among all players'
+                                : 'One player pays the full shuttle cost (e.g., if they lose it)',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          value: _divideShuttleEqually,
+                          activeColor: Colors.amber,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _divideShuttleEqually = value ?? true;
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Cost Preview (for 4 players)',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              const SizedBox(height: 8),
+                              _buildCostPreview(),
+                            ],
+                          ),
                         ),
                       ],
                     ),

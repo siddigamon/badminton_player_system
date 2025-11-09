@@ -17,7 +17,8 @@ class GameData {
       shuttleCockPrice: 15.0,
       divideCourtEqually: true,
       createdDate: DateTime.now().subtract(const Duration(days: 1)),
-      numberOfPlayers: 4,
+      numberOfPlayers: 4, 
+      divideShuttleEqually: true,
     ),
     GameItem(
       id: '2',
@@ -35,6 +36,7 @@ class GameData {
       divideCourtEqually: true,
       createdDate: DateTime.now().subtract(const Duration(hours: 12)),
       numberOfPlayers: 2,
+      divideShuttleEqually: true,
     ),
     GameItem(
       id: '3',
@@ -52,6 +54,7 @@ class GameData {
       divideCourtEqually: false,
       createdDate: DateTime.now().subtract(const Duration(hours: 6)),
       numberOfPlayers: 3,
+      divideShuttleEqually: false,
     ),
   ];
 

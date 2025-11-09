@@ -17,6 +17,7 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
   final TextEditingController _shuttleCockPriceController = TextEditingController();
   
   bool _divideCourtEqually = true;
+  bool _divideShuttleEqually = true;
 
   @override
   void initState() {
@@ -37,6 +38,9 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     _courtRateController.text = UserSettings.defaultCourtRate.toString();
     _shuttleCockPriceController.text = UserSettings.defaultShuttleCockPrice.toString();
     _divideCourtEqually = UserSettings.defaultDivideCourtEqually;
+    _divideShuttleEqually = UserSettings.defaultDivideShuttleEqually;
+
+    
   }
 
   void _saveUserSettings() {
@@ -54,6 +58,8 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
     UserSettings.updateCourtRate(_courtRateController.text);
     UserSettings.updateShuttleCockPrice(_shuttleCockPriceController.text);
     UserSettings.updateDivideCourtEqually(_divideCourtEqually);
+    UserSettings.updateDivideShuttleEqually(_divideShuttleEqually);
+
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -81,12 +87,15 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                 _courtRateController.text = '50.00';
                 _shuttleCockPriceController.text = '15.00';
                 _divideCourtEqually = true;
+                _divideShuttleEqually = true;
+
               });
               
               UserSettings.updateCourtName('Badminton Court 1');
               UserSettings.updateCourtRate('50.00');
               UserSettings.updateShuttleCockPrice('15.00');
               UserSettings.updateDivideCourtEqually(true);
+              UserSettings.updateDivideShuttleEqually(true);
               
               Navigator.of(ctx).pop();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -262,6 +271,23 @@ class _UserSettingsScreenState extends State<UserSettingsScreen> {
                           onChanged: (bool? value) {
                             setState(() {
                               _divideCourtEqually = value ?? true;
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        CheckboxListTile(
+                          title: const Text('Divide shuttle cost equally among players'),
+                          subtitle: Text(
+                            _divideShuttleEqually 
+                                ? 'Shuttle cost will be split equally among all players'
+                                : 'One player pays the full shuttle cost',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          value: _divideShuttleEqually,
+                          activeColor: Colors.amber,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _divideShuttleEqually = value ?? true;
                             });
                           },
                           contentPadding: EdgeInsets.zero,
