@@ -154,7 +154,7 @@ class _PlayersState extends State<Players> {
     );
   }
 
-  // NEW: Game management methods (using GameData)
+  
   void _addGameItem(GameItem game) {
     setState(() {
       GameData.addGame(game);
@@ -244,7 +244,7 @@ class _PlayersState extends State<Players> {
                 ),
               ),
               onChanged: (value) {
-                setState(() {}); // Refresh the list when search text changes
+                setState(() {}); // Refresh 
               },
             ),
           ),
@@ -358,8 +358,8 @@ class _PlayersState extends State<Players> {
       onGameDeleted: _deleteGameItem,
       onNavigateToAddGame: _navigateToAddGame,
       availablePlayers: playerItems,
-    ),     // Index 2 - All Games screen
-      const UserSettingsScreen(), // Index 3 - Settings screen
+    ),     
+      const UserSettingsScreen(), // Index 3 
     ];
 
     return Scaffold(
