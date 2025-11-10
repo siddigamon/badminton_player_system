@@ -44,14 +44,14 @@ class GameItem {
     if (divideCourtEqually && actualPlayerCount > 0) {
       return courtCost / actualPlayerCount;
     }
-    return 0; // If not divided equally, each player pays their own court portion
+    return 0; 
   }
 
   double get shuttleCostPerPlayer {
     if (divideShuttleEqually && actualPlayerCount > 0) {
       return shuttleCockPrice / actualPlayerCount;
     }
-    return 0; // If not divided equally, one player pays full shuttle cost
+    return 0; 
   }
 
   double get costPerPlayer {
@@ -81,17 +81,17 @@ class GameItem {
     }
   }
 
-  String get paymentMethodDescription {
-    if (divideCourtEqually && divideShuttleEqually) {
-      return 'All costs shared equally among players';
-    } else if (divideCourtEqually && !divideShuttleEqually) {
-      return 'Court cost shared, shuttle paid by one player';
-    } else if (!divideCourtEqually && divideShuttleEqually) {
-      return 'Individual court cost, shuttle shared equally';
-    } else {
-      return 'All costs paid individually';
-    }
-  }
+  // String get paymentMethodDescription {
+  //   if (divideCourtEqually && divideShuttleEqually) {
+  //     return 'All costs shared equally among players';
+  //   } else if (divideCourtEqually && !divideShuttleEqually) {
+  //     return 'Court cost shared, shuttle paid by one player';
+  //   } else if (!divideCourtEqually && divideShuttleEqually) {
+  //     return 'Individual court cost, shuttle shared equally';
+  //   } else {
+  //     return 'All costs paid individually';
+  //   }
+  // }
 
   String get displayTitle {
     if (gameTitle.isNotEmpty) {

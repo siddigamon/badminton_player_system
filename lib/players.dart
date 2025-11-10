@@ -154,7 +154,7 @@ class _PlayersState extends State<Players> {
     );
   }
 
-  // NEW: Game management methods (using GameData)
+  
   void _addGameItem(GameItem game) {
     setState(() {
       GameData.addGame(game);
@@ -169,7 +169,7 @@ class _PlayersState extends State<Players> {
 
   void _navigateToAddGame() {
     setState(() {
-      _selectedIndex = 1; // Add Game tab
+      _selectedIndex = 1; 
     });
   }
 
@@ -228,7 +228,7 @@ class _PlayersState extends State<Players> {
                 ),
               ),
               onChanged: (value) {
-                setState(() {}); // Refresh the list when search text changes
+                setState(() {}); // Refresh 
               },
             ),
           ),
@@ -335,15 +335,15 @@ class _PlayersState extends State<Players> {
   Widget build(BuildContext context) {
     // Define the screens for navigation
     final List<Widget> screens = [
-      _buildPlayersScreen(),      // Index 0 - Players screen (default)
-      AddGameScreen(onGameAdded: _addGameItem),      // Index 1 - Add Game screen
-      AllGamesScreen(                           // Index 2 - All Games screen (with parameters)
+      _buildPlayersScreen(),      // Index 0 - 
+      AddGameScreen(onGameAdded: _addGameItem),      // Index 1 
+      AllGamesScreen(                           // Index 2 
       games: GameData.gameItems,
       onGameDeleted: _deleteGameItem,
       onNavigateToAddGame: _navigateToAddGame,
       availablePlayers: playerItems,
-    ),     // Index 2 - All Games screen
-      const UserSettingsScreen(), // Index 3 - Settings screen
+    ),     
+      const UserSettingsScreen(), // Index 3 
     ];
 
     return Scaffold(

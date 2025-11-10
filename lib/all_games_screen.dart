@@ -51,25 +51,6 @@ class _AllGamesScreenState extends State<AllGamesScreen> {
     }).toList();
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
-
-  String _getScheduleDisplay(GameItem game) {
-    if (game.schedules.isEmpty) return 'No schedule';
-    
-    if (game.schedules.length == 1) {
-      final schedule = game.schedules.first;
-      return '${_formatDate(schedule.startTime)} at ${_formatTime(schedule.startTime)}';
-    } else {
-      final firstSchedule = game.schedules.first;
-      return '${_formatDate(firstSchedule.startTime)} (+${game.schedules.length - 1} more)';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
