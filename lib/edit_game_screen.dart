@@ -120,6 +120,8 @@ class _EditGameScreenState extends State<EditGameScreen> {
       createdDate: widget.game.createdDate,
       numberOfPlayers: widget.game.numberOfPlayers,
       queuedPlayers: widget.game.queuedPlayers,
+      shuttlePayerPlayerId: widget.game.shuttlePayerPlayerId, // ADD THIS LINE
+
     );
 
     GameData.updateGame(updatedGame);

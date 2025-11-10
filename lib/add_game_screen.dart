@@ -111,6 +111,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
       divideCourtEqually: _divideCourtEqually,
       createdDate: DateTime.now(), 
       divideShuttleEqually: _divideShuttleEqually,
+      shuttlePayerPlayerId: null,
     );
 
     print('Game saved: ${game.displayTitle}');

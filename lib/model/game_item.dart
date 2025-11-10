@@ -12,6 +12,7 @@ class GameItem {
   final DateTime createdDate;
   final int numberOfPlayers;
   final List<PlayerItem>? queuedPlayers;
+  final String? shuttlePayerPlayerId;
 
   GameItem({
     required this.id,
@@ -21,23 +22,19 @@ class GameItem {
     required this.courtRate,
     required this.shuttleCockPrice,
     required this.divideCourtEqually,
-    required this.divideShuttleEqually,  
+    required this.divideShuttleEqually,
     required this.createdDate,
     this.numberOfPlayers = 0,
     this.queuedPlayers,
+    this.shuttlePayerPlayerId,
   });
 
-  double get totalCost {
-    double courtCost = 0;
+  double get courtCost {
+    double cost = 0;
     for (var schedule in schedules) {
-      courtCost += courtRate * schedule.durationInHours;
+      cost += courtRate * schedule.durationInHours;
     }
-    return courtCost + shuttleCockPrice;
-  }
-
-  // Get actual number of players 
-  int get actualPlayerCount {
-    return queuedPlayers?.length ?? numberOfPlayers;
+    return cost;
   }
 
   double get courtCostPerPlayer {
@@ -49,7 +46,7 @@ class GameItem {
 
   double get shuttleCostPerPlayer {
     if (divideShuttleEqually && actualPlayerCount > 0) {
-      return shuttleCockPrice / actualPlayerCount;
+      return shuttleCockPrice / actualPlayerCount; // Split equally
     }
     return 0; 
   }
@@ -58,40 +55,96 @@ class GameItem {
     return courtCostPerPlayer + shuttleCostPerPlayer;
   }
 
-  double get courtCost {
-    double cost = 0;
-    for (var schedule in schedules) {
-      cost += courtRate * schedule.durationInHours;
-    }
-    return cost;
-  }
-  String get costDisplayText {
-    if (actualPlayerCount == 0) {
-      return '₱${totalCost.toStringAsFixed(2)} total (waiting for players)';
-    }
-    
-    if (divideCourtEqually && divideShuttleEqually) {
-      return '₱${costPerPlayer.toStringAsFixed(2)} per player (everything split)';
-    } else if (divideCourtEqually && !divideShuttleEqually) {
-      return '₱${courtCostPerPlayer.toStringAsFixed(2)} per player + ₱${shuttleCockPrice.toStringAsFixed(2)} shuttle (1 player)';
-    } else if (!divideCourtEqually && divideShuttleEqually) {
-      return 'Individual court cost + ₱${shuttleCostPerPlayer.toStringAsFixed(2)} shuttle per player';
+  double get regularPlayerCost {
+    if (divideShuttleEqually) {
+      return courtCostPerPlayer + shuttleCostPerPlayer; // Normal split
     } else {
-      return '₱${totalCost.toStringAsFixed(2)} total (individual payment)';
+      return courtCostPerPlayer; 
     }
   }
 
-  // String get paymentMethodDescription {
-  //   if (divideCourtEqually && divideShuttleEqually) {
-  //     return 'All costs shared equally among players';
-  //   } else if (divideCourtEqually && !divideShuttleEqually) {
-  //     return 'Court cost shared, shuttle paid by one player';
-  //   } else if (!divideCourtEqually && divideShuttleEqually) {
-  //     return 'Individual court cost, shuttle shared equally';
-  //   } else {
-  //     return 'All costs paid individually';
-  //   }
-  // }
+  double get shuttlePayerCost {
+    if (divideShuttleEqually) {
+      return courtCostPerPlayer + shuttleCostPerPlayer; // Same as everyone
+    } else {
+      return courtCostPerPlayer + shuttleCockPrice; 
+    }
+  }
+
+  double getCostForPlayer(PlayerItem player) {
+    if (divideCourtEqually && divideShuttleEqually) {
+      return costPerPlayer; 
+    } else if (divideCourtEqually && !divideShuttleEqually) {
+      if (player.fullName == shuttlePayerPlayerId) {
+        return courtCostPerPlayer + shuttleCockPrice; 
+      } else {
+        return courtCostPerPlayer; 
+      }
+    } else if (!divideCourtEqually && divideShuttleEqually) {
+      return shuttleCostPerPlayer; 
+    } else {
+      return 0; 
+    }
+  }
+
+  String getCostDisplayForPlayer(PlayerItem player) {
+    if (actualPlayerCount == 0) return 'Waiting for players';
+    
+    final cost = getCostForPlayer(player);
+    
+    if (divideCourtEqually && divideShuttleEqually) {
+      return '₱${cost.toStringAsFixed(2)} (equal split)';
+    } else if (divideCourtEqually && !divideShuttleEqually) {
+      if (player.fullName == shuttlePayerPlayerId) {
+        return '₱${cost.toStringAsFixed(2)} (court + shuttle)';
+      } else {
+        return '₱${courtCostPerPlayer.toStringAsFixed(2)} (court only)';
+      }
+    } else if (!divideCourtEqually && divideShuttleEqually) {
+      return '₱${shuttleCostPerPlayer.toStringAsFixed(2)} (shuttle only)';
+    } else {
+      return 'Individual payment';
+    }
+  }
+
+  PlayerItem? get shuttlePayerPlayer {
+    if (shuttlePayerPlayerId == null || queuedPlayers == null) return null;
+    try {
+      return queuedPlayers!.firstWhere(
+        (player) => player.fullName == shuttlePayerPlayerId,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Cost display logic
+  String get costDisplayText {
+    if (actualPlayerCount == 0) {
+      return '₱${(courtCost + shuttleCockPrice).toStringAsFixed(2)} total (waiting for players)';
+    }
+    
+    if (divideShuttleEqually) {
+      final perPlayer = (courtCostPerPlayer + shuttleCostPerPlayer);
+      return '₱${perPlayer.toStringAsFixed(2)} per player (everything split)';
+    } else {
+      if (shuttlePayerPlayerId != null) {
+        final shuttlePlayer = shuttlePayerPlayer?.nickname ?? "Someone";
+        return '₱${courtCostPerPlayer.toStringAsFixed(2)} each + ₱${shuttleCockPrice.toStringAsFixed(2)} shuttle ($shuttlePlayer pays)';
+      } else {
+        return '₱${courtCostPerPlayer.toStringAsFixed(2)} each + shuttle assignment needed';
+      }
+    }
+  }
+
+  // Existing methods
+  double get totalCost {
+    return courtCost + shuttleCockPrice;
+  }
+
+  int get actualPlayerCount {
+    return queuedPlayers?.length ?? numberOfPlayers;
+  }
 
   String get displayTitle {
     if (gameTitle.isNotEmpty) {
@@ -116,7 +169,6 @@ class GameSchedule {
     required this.endTime,
   });
 
-  // duration in hours
   double get durationInHours {
     final duration = endTime.difference(startTime);
     return duration.inMinutes / 60.0;
