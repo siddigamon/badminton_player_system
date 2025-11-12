@@ -55,21 +55,7 @@ class GameItem {
     return courtCostPerPlayer + shuttleCostPerPlayer;
   }
 
-  double get regularPlayerCost {
-    if (divideShuttleEqually) {
-      return courtCostPerPlayer + shuttleCostPerPlayer; // Normal split
-    } else {
-      return courtCostPerPlayer; 
-    }
-  }
-
-  double get shuttlePayerCost {
-    if (divideShuttleEqually) {
-      return courtCostPerPlayer + shuttleCostPerPlayer; // Same as everyone
-    } else {
-      return courtCostPerPlayer + shuttleCockPrice; 
-    }
-  }
+  
 
   double getCostForPlayer(PlayerItem player) {
     if (divideCourtEqually && divideShuttleEqually) {
@@ -137,7 +123,6 @@ class GameItem {
     }
   }
 
-  // Existing methods
   double get totalCost {
     return courtCost + shuttleCockPrice;
   }
