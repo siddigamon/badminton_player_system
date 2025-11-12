@@ -126,7 +126,7 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
       title: const Text('Who will pay for the shuttle?'),
       content: SizedBox(
         width: double.maxFinite,
-        height: 250,
+        height: 300,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -137,9 +137,62 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
-                itemCount: _queuedPlayers.length,
+                itemCount: _queuedPlayers.length + 1, // +1 for deassign option
                 itemBuilder: (context, index) {
-                  final player = _queuedPlayers[index];
+                  // First item is the deassign option
+                  if (index == 0) {
+                    final isNoOneAssigned = _game.shuttlePayerPlayerId == null || _game.shuttlePayerPlayerId!.isEmpty;
+                    
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isNoOneAssigned ? Colors.green : Colors.grey,
+                        child: Icon(
+                          isNoOneAssigned ? Icons.check : Icons.remove,
+                          color: Colors.white,
+                        ),
+                      ),
+                      title: const Text('No one assigned', style: TextStyle(fontStyle: FontStyle.italic)),
+                      subtitle: Text(
+                        isNoOneAssigned
+                            ? 'Currently: Shuttle cost divided equally'
+                            : 'Click to remove assignment and divide equally',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isNoOneAssigned ? Colors.green : Colors.grey,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _game = GameItem(
+                            id: _game.id,
+                            gameTitle: _game.gameTitle,
+                            courtName: _game.courtName,
+                            schedules: _game.schedules,
+                            courtRate: _game.courtRate,
+                            shuttleCockPrice: _game.shuttleCockPrice,
+                            divideCourtEqually: _game.divideCourtEqually,
+                            divideShuttleEqually: _game.divideShuttleEqually,
+                            createdDate: _game.createdDate,
+                            numberOfPlayers: _queuedPlayers.length,
+                            queuedPlayers: _queuedPlayers,
+                            shuttlePayerPlayerId: null, // Deassign
+                          );
+                        });
+                        _updateGameWithQueue();
+                        Navigator.of(ctx).pop();
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Shuttle payer removed - cost will be divided equally'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  
+                  // Regular player items (index - 1 because of deassign option)
+                  final player = _queuedPlayers[index - 1];
                   final isSelected = _game.shuttlePayerPlayerId == player.fullName;
                   
                   return ListTile(
