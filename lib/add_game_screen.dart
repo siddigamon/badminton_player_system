@@ -748,7 +748,7 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
   }
 
   void _saveSchedule() async {
-  print('\n📅 SAVE SCHEDULE STARTED');
+  print('\n SAVE SCHEDULE STARTED');
   print('Form valid: ${_formKey.currentState?.validate()}');
   
   if (!_formKey.currentState!.validate()) return;
@@ -776,7 +776,7 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
 
   // Basic time validation
   if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
-    print('❌ Invalid time range - End time must be after start time');
+    print('Invalid time range - End time must be after start time');
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('End time must be after start time'),
@@ -795,12 +795,12 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
 
   // NEW: Use passed conflict detection function
   if (widget.hasConflict != null) {
-    print('🔍 RUNNING CONFLICT CHECK WITH PASSED FUNCTION');
+    print('RUNNING CONFLICT CHECK WITH PASSED FUNCTION');
     
     // Create list excluding current schedule if editing
     List<GameSchedule> schedulesToCheck = List.from(widget.existingSchedules);
     if (widget.schedule != null) {
-      print('🔄 EDITING MODE - Removing original schedule from conflict check');
+      print('EDITING MODE - Removing original schedule from conflict check');
       schedulesToCheck.removeWhere((schedule) => 
         schedule.courtNumber == widget.schedule!.courtNumber &&
         schedule.startTime == widget.schedule!.startTime &&
@@ -810,7 +810,7 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
     }
     
     if (widget.hasConflict!(newSchedule, schedulesToCheck)) {
-      print('🚨 CONFLICT DETECTED - Showing dialog');
+      print('CONFLICT DETECTED - Showing dialog');
       
       // Find the conflicting schedule for display
       GameSchedule? conflictingSchedule;
@@ -833,27 +833,25 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
       if (conflictingSchedule != null) {
         final shouldSaveAnyway = await _showConflictDialog(newSchedule, conflictingSchedule);
         if (!shouldSaveAnyway) {
-          print('❌ User cancelled - Schedule not saved');
+          print('User cancelled - Schedule not saved');
           return;
         } else {
-          print('⚠️ User chose to save anyway');
+          print('User chose to save anyway');
         }
       }
     } else {
-      print('✅ NO CONFLICTS - Safe to save');
+      print('NO CONFLICTS - Safe to save');
     }
   } else {
-    print('⚠️ No conflict checker provided - Skipping conflict check');
+    print('No conflict checker provided - Skipping conflict check');
   }
 
-  // Save the schedule
-  print('💾 SAVING SCHEDULE');
+  print('SAVING SCHEDULE');
   widget.onScheduleAdded(newSchedule);
   Navigator.of(context).pop();
-  print('✅ Schedule saved and dialog closed');
+  print('Schedule saved and dialog closed');
 }
 
-// NEW: Add conflict dialog method
 Future<bool> _showConflictDialog(GameSchedule newSchedule, GameSchedule conflictingSchedule) async {
   final result = await showDialog<bool>(
     context: context,

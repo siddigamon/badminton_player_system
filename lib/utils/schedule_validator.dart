@@ -11,18 +11,18 @@ class ScheduleValidator {
     
     // Different courts can't overlap
     if (schedule1.courtNumber.toLowerCase() != schedule2.courtNumber.toLowerCase()) {
-      print('  ❌ Different courts - NO OVERLAP');
+      print(' Different courts - NO OVERLAP');
       return false;
     }
-    print('  ✅ Same court - checking dates...');
+    print(' Same court - checking dates...');
     
     // Different dates can't overlap
     if (!_isSameDate(schedule1.startTime, schedule2.startTime)) {
-      print('  ❌ Different dates - NO OVERLAP');
+      print(' Different dates - NO OVERLAP');
       return false;
     }
-    print('  ✅ Same date - checking times...');
-    
+    print(' ✅ Same date - checking times...');
+
     // Check time overlap: Two time periods overlap if:
     // start1 < end2 AND start2 < end1
     bool overlap = schedule1.startTime.isBefore(schedule2.endTime) && 
@@ -31,7 +31,7 @@ class ScheduleValidator {
     print('  Time overlap check:');
     print('    ${_formatDateTime(schedule1.startTime)} < ${_formatDateTime(schedule2.endTime)}? ${schedule1.startTime.isBefore(schedule2.endTime)}');
     print('    ${_formatDateTime(schedule2.startTime)} < ${_formatDateTime(schedule1.endTime)}? ${schedule2.startTime.isBefore(schedule1.endTime)}');
-    print('    OVERLAP RESULT: ${overlap ? "⚠️ YES - CONFLICT!" : "✅ NO - SAFE"}');
+    print('    OVERLAP RESULT: ${overlap ? "YES - CONFLICT!" : "NO - SAFE"}');
     
     return overlap;
   }
@@ -41,7 +41,7 @@ class ScheduleValidator {
     GameSchedule newSchedule, 
     List<GameSchedule> existingSchedules
   ) {
-    print('\n🚀 CONFLICT DETECTION STARTED');
+    print('CONFLICT DETECTION STARTED');
     print('New schedule: Court ${newSchedule.courtNumber}, ${_formatDateTime(newSchedule.startTime)} - ${_formatDateTime(newSchedule.endTime)}');
     print('Checking against ${existingSchedules.length} existing schedules:');
     
@@ -55,7 +55,7 @@ class ScheduleValidator {
       }
     }
     
-    print('\n✅ NO CONFLICTS FOUND - Schedule is safe to add');
+    print('\n NO CONFLICTS FOUND - Schedule is safe to add');
     return null;
   }
   
@@ -74,7 +74,7 @@ class ScheduleValidator {
     GameSchedule newSchedule, 
     GameSchedule conflictingSchedule
   ) async {
-    print('🎭 SHOWING CONFLICT DIALOG');
+    print('SHOWING CONFLICT DIALOG');
     
     final result = await showDialog<bool>(
       context: context,
