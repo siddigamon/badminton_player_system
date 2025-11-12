@@ -19,6 +19,7 @@ class GameData {
       createdDate: DateTime.now().subtract(const Duration(days: 1)),
       numberOfPlayers: 4, 
       divideShuttleEqually: true,
+      shuttlePayerPlayerId: null,
     ),
     GameItem(
       id: '2',
@@ -37,6 +38,7 @@ class GameData {
       createdDate: DateTime.now().subtract(const Duration(hours: 12)),
       numberOfPlayers: 2,
       divideShuttleEqually: true,
+      shuttlePayerPlayerId: null,
     ),
     GameItem(
       id: '3',
@@ -55,6 +57,7 @@ class GameData {
       createdDate: DateTime.now().subtract(const Duration(hours: 6)),
       numberOfPlayers: 3,
       divideShuttleEqually: false,
+      shuttlePayerPlayerId: null,
     ),
   ];
 

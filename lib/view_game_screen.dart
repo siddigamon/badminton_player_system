@@ -93,6 +93,8 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
       numberOfPlayers: _queuedPlayers.length,
       queuedPlayers: _queuedPlayers, 
       divideShuttleEqually: _game.divideShuttleEqually,
+      shuttlePayerPlayerId: _game.shuttlePayerPlayerId, 
+
     );
     
     GameData.updateGame(_game);
@@ -106,6 +108,101 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
+
+  void _selectShuttlePayer() {
+  if (_queuedPlayers.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Add players to queue first'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+    return;
+  }
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Who will pay for the shuttle?'),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 250,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Select the player who will pay the full shuttle cost:',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _queuedPlayers.length,
+                itemBuilder: (context, index) {
+                  final player = _queuedPlayers[index];
+                  final isSelected = _game.shuttlePayerPlayerId == player.fullName;
+                  
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: isSelected ? Colors.orange : Colors.grey,
+                      child: Icon(
+                        isSelected ? Icons.sports : Icons.person,
+                        color: Colors.white,
+                      ),
+                    ),
+                    title: Text(player.fullName),
+                    subtitle: Text(
+                      isSelected
+                          ? 'Currently assigned - Will pay: ₱${(_game.courtCostPerPlayer + _game.shuttleCockPrice).toStringAsFixed(2)}'
+                          : 'Would pay: ₱${(_game.courtCostPerPlayer + _game.shuttleCockPrice).toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isSelected ? Colors.orange : Colors.grey,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _game = GameItem(
+                          id: _game.id,
+                          gameTitle: _game.gameTitle,
+                          courtName: _game.courtName,
+                          schedules: _game.schedules,
+                          courtRate: _game.courtRate,
+                          shuttleCockPrice: _game.shuttleCockPrice,
+                          divideCourtEqually: _game.divideCourtEqually,
+                          divideShuttleEqually: _game.divideShuttleEqually,
+                          createdDate: _game.createdDate,
+                          numberOfPlayers: _queuedPlayers.length,
+                          queuedPlayers: _queuedPlayers,
+                          shuttlePayerPlayerId: player.fullName, // NEW
+                        );
+                      });
+                      _updateGameWithQueue();
+                      Navigator.of(ctx).pop();
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${player.nickname} will pay for shuttle if lost'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    ),
+  );
+}
 
   void _showAddPlayerDialog() {
     final availableToAdd = widget.availablePlayers
@@ -314,17 +411,67 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                             ],
                             
                             // Special note for shuttle individual payment
-                            if (!_game.divideShuttleEqually) ...[
-                              const SizedBox(height: 8),
+                            // Add this after the cost breakdown section
+                            if (!_game.divideShuttleEqually && _queuedPlayers.isNotEmpty) ...[
+                              const SizedBox(height: 16),
                               Container(
-                                padding: const EdgeInsets.all(8),
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.orange.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
                                 ),
-                                child: Text(
-                                  'Note: One player pays ₱${_game.shuttleCockPrice.toStringAsFixed(2)} for shuttle (e.g., if they lose it)',
-                                  style: const TextStyle(fontSize: 12, color: Colors.orange),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.sports, color: Colors.orange, size: 20),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Shuttle Payment Assignment',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    if (_game.shuttlePayerPlayerId == null) ...[
+                                      const Text(
+                                        'No shuttle payer assigned yet',
+                                        style: TextStyle(color: Colors.orange),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        onPressed: _selectShuttlePayer,
+                                        icon: const Icon(Icons.assignment_ind),
+                                        label: const Text('Assign Shuttle Payer'),
+                                      ),
+                                    ] else ...[
+                                      Text(
+                                        'Shuttle payer: ${_game.shuttlePayerPlayer?.nickname ?? "Unknown"}',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        'Will pay: ₱${(_game.courtCostPerPlayer + _game.shuttleCockPrice).toStringAsFixed(2)} (if shuttle is lost)',
+                                        style: const TextStyle(fontSize: 12, color: Colors.orange),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        onPressed: _selectShuttlePayer,
+                                        icon: const Icon(Icons.swap_horiz),
+                                        label: const Text('Change Shuttle Payer'),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ],
@@ -459,13 +606,22 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                               color: Colors.green.withOpacity(0.05),
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.green,
-                                  child: Text(
-                                    '${index + 1}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  backgroundColor: player.fullName == _game.shuttlePayerPlayerId 
+                                      ? Colors.orange 
+                                      : Colors.green,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '${index + 1}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (player.fullName == _game.shuttlePayerPlayerId)
+                                        const Icon(Icons.sports, color: Colors.white, size: 12),
+                                    ],
                                   ),
                                 ),
                                 title: Text(
@@ -477,56 +633,78 @@ class _ViewGameScreenState extends State<ViewGameScreen> {
                                   children: [
                                     Text('${player.nickname} • ${player.level.name}'),
                                     if (_game.actualPlayerCount > 0) ...[
-                                      if (_game.divideCourtEqually && _game.divideShuttleEqually)
-                                        Text(
-                                          'Owes: ₱${_game.costPerPlayer.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.green,
-                                            fontSize: 12,
-                                          ),
-                                        )
-                                      else if (_game.divideCourtEqually && !_game.divideShuttleEqually)
-                                        Text(
-                                          'Court: ₱${_game.courtCostPerPlayer.toStringAsFixed(2)} + shuttle varies',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.orange,
-                                            fontSize: 12,
-                                          ),
-                                        )
-                                      else if (!_game.divideCourtEqually && _game.divideShuttleEqually)
-                                        Text(
-                                          'Individual court + ₱${_game.shuttleCostPerPlayer.toStringAsFixed(2)} shuttle',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue,
-                                            fontSize: 12,
-                                          ),
-                                        )
-                                      else
+                                      Text(
+                                        'Owes: ${_game.getCostDisplayForPlayer(player)}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: player.fullName == _game.shuttlePayerPlayerId ? Colors.orange : Colors.green,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      if (player.fullName == _game.shuttlePayerPlayerId)
                                         const Text(
-                                          'Individual payment',
+                                          'Shuttle Payer',
                                           style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.orange,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.grey,
-                                            fontSize: 12,
                                           ),
                                         ),
                                     ],
                                   ],
                                 ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.remove_circle, color: Colors.red),
-                                  onPressed: () => _removePlayerFromQueue(player),
-                                  tooltip: 'Remove from queue',
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (!_game.divideShuttleEqually && _queuedPlayers.length > 1)
+                                      IconButton(
+                                        icon: Icon(
+                                          player.fullName == _game.shuttlePayerPlayerId 
+                                              ? Icons.sports 
+                                              : Icons.sports_outlined,
+                                          color: player.fullName == _game.shuttlePayerPlayerId 
+                                              ? Colors.orange 
+                                              : Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _game = GameItem(
+                                              id: _game.id,
+                                              gameTitle: _game.gameTitle,
+                                              courtName: _game.courtName,
+                                              schedules: _game.schedules,
+                                              courtRate: _game.courtRate,
+                                              shuttleCockPrice: _game.shuttleCockPrice,
+                                              divideCourtEqually: _game.divideCourtEqually,
+                                              divideShuttleEqually: _game.divideShuttleEqually,
+                                              createdDate: _game.createdDate,
+                                              numberOfPlayers: _queuedPlayers.length,
+                                              queuedPlayers: _queuedPlayers,
+                                              shuttlePayerPlayerId: player.fullName,
+                                            );
+                                          });
+                                          _updateGameWithQueue();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('${player.nickname} will pay for the shuttle'),
+                                              backgroundColor: Colors.orange,
+                                            ),
+                                          );
+                                        },
+                                        tooltip: 'Make shuttle payer',
+                                      ),
+                                    IconButton(
+                                      icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                      onPressed: () => _removePlayerFromQueue(player),
+                                      tooltip: 'Remove from queue',
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           );
                         }).toList(),
                       ),
-
                     if (_queuedPlayers.length == 4) ...[
                       const SizedBox(height: 16),
                       Container(

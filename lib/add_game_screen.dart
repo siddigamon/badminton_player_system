@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:badminton_player_system/model/game_item.dart';
 import 'package:badminton_player_system/model/user_settings.dart';
+import 'package:badminton_player_system/utils/schedule_validator.dart'; 
+
 
 class AddGameScreen extends StatefulWidget {
   final Function(GameItem)? onGameAdded;
@@ -48,31 +50,66 @@ class _AddGameScreenState extends State<AddGameScreen> {
   }
 
   void _addSchedule() {
-    showDialog(
-      context: context,
-      builder: (ctx) => _ScheduleDialog(
-        onScheduleAdded: (schedule) {
-          setState(() {
-            _schedules.add(schedule);
-          });
-        },
-      ),
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (ctx) => _ScheduleDialog(
+      onScheduleAdded: (schedule) {
+        setState(() {
+          _schedules.add(schedule);
+        });
+      },
+      existingSchedules: _schedules, // NEW: Pass current schedules
+      hasConflict: (newSchedule, existingSchedules) { // NEW: Conflict checker
+        for (var existing in existingSchedules) {
+          // Same court check
+          if (existing.courtNumber.toLowerCase() != newSchedule.courtNumber.toLowerCase()) continue;
+          
+          // Same date check
+          if (existing.startTime.year != newSchedule.startTime.year ||
+              existing.startTime.month != newSchedule.startTime.month ||
+              existing.startTime.day != newSchedule.startTime.day) continue;
+          
+          // Time overlap check: start1 < end2 AND start2 < end1
+          if (existing.startTime.isBefore(newSchedule.endTime) && 
+              newSchedule.startTime.isBefore(existing.endTime)) {
+            return true; // Conflict found
+          }
+        }
+        return false; // No conflicts
+      },
+    ),
+  );
+}
 
-  void _editSchedule(int index) {
-    showDialog(
-      context: context,
-      builder: (ctx) => _ScheduleDialog(
-        schedule: _schedules[index],
-        onScheduleAdded: (schedule) {
-          setState(() {
-            _schedules[index] = schedule;
-          });
-        },
-      ),
-    );
-  }
+void _editSchedule(int index) {
+  showDialog(
+    context: context,
+    builder: (ctx) => _ScheduleDialog(
+      schedule: _schedules[index],
+      onScheduleAdded: (schedule) {
+        setState(() {
+          _schedules[index] = schedule;
+        });
+      },
+      existingSchedules: _schedules, // NEW: Pass current schedules  
+      hasConflict: (newSchedule, existingSchedules) { // NEW: Same conflict checker
+        for (var existing in existingSchedules) {
+          if (existing.courtNumber.toLowerCase() != newSchedule.courtNumber.toLowerCase()) continue;
+          
+          if (existing.startTime.year != newSchedule.startTime.year ||
+              existing.startTime.month != newSchedule.startTime.month ||
+              existing.startTime.day != newSchedule.startTime.day) continue;
+          
+          if (existing.startTime.isBefore(newSchedule.endTime) && 
+              newSchedule.startTime.isBefore(existing.endTime)) {
+            return true;
+          }
+        }
+        return false;
+      },
+    ),
+  );
+}
 
   void _removeSchedule(int index) {
     setState(() {
@@ -111,6 +148,7 @@ class _AddGameScreenState extends State<AddGameScreen> {
       divideCourtEqually: _divideCourtEqually,
       createdDate: DateTime.now(), 
       divideShuttleEqually: _divideShuttleEqually,
+      shuttlePayerPlayerId: null,
     );
 
     print('Game saved: ${game.displayTitle}');
@@ -627,10 +665,15 @@ void _cancelGame() {
 class _ScheduleDialog extends StatefulWidget {
   final GameSchedule? schedule;
   final Function(GameSchedule) onScheduleAdded;
+  final List<GameSchedule> existingSchedules; 
+  final bool Function(GameSchedule, List<GameSchedule>)? hasConflict; 
+
 
   const _ScheduleDialog({
     this.schedule,
     required this.onScheduleAdded,
+    required this.existingSchedules,
+    this.hasConflict,
   });
 
   @override
@@ -704,45 +747,189 @@ class _ScheduleDialogState extends State<_ScheduleDialog> {
     }
   }
 
-  void _saveSchedule() {
-    if (!_formKey.currentState!.validate()) return;
+  void _saveSchedule() async {
+  print('\n SAVE SCHEDULE STARTED');
+  print('Form valid: ${_formKey.currentState?.validate()}');
+  
+  if (!_formKey.currentState!.validate()) return;
 
-    final startDateTime = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      _startTime.hour,
-      _startTime.minute,
+  final startDateTime = DateTime(
+    _selectedDate.year,
+    _selectedDate.month,
+    _selectedDate.day,
+    _startTime.hour,
+    _startTime.minute,
+  );
+
+  final endDateTime = DateTime(
+    _selectedDate.year,
+    _selectedDate.month,
+    _selectedDate.day,
+    _endTime.hour,
+    _endTime.minute,
+  );
+
+  print('Proposed schedule:');
+  print('  Court: ${_courtNumberController.text.trim()}');
+  print('  Start: $startDateTime');
+  print('  End: $endDateTime');
+
+  // Basic time validation
+  if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
+    print('Invalid time range - End time must be after start time');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('End time must be after start time'),
+        backgroundColor: Colors.red,
+      ),
     );
+    return;
+  }
+  print('✅ Time range is valid');
 
-    final endDateTime = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      _endTime.hour,
-      _endTime.minute,
-    );
+  final newSchedule = GameSchedule(
+    courtNumber: _courtNumberController.text.trim(),
+    startTime: startDateTime,
+    endTime: endDateTime,
+  );
 
-    if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('End time must be after start time'),
-          backgroundColor: Colors.red,
-        ),
+  // NEW: Use passed conflict detection function
+  if (widget.hasConflict != null) {
+    print('RUNNING CONFLICT CHECK WITH PASSED FUNCTION');
+    
+    // Create list excluding current schedule if editing
+    List<GameSchedule> schedulesToCheck = List.from(widget.existingSchedules);
+    if (widget.schedule != null) {
+      print('EDITING MODE - Removing original schedule from conflict check');
+      schedulesToCheck.removeWhere((schedule) => 
+        schedule.courtNumber == widget.schedule!.courtNumber &&
+        schedule.startTime == widget.schedule!.startTime &&
+        schedule.endTime == widget.schedule!.endTime
       );
-      return;
+      print('Schedules after removal: ${schedulesToCheck.length}');
     }
-
-    final schedule = GameSchedule(
-      courtNumber: _courtNumberController.text.trim(),
-      startTime: startDateTime,
-      endTime: endDateTime,
-    );
-
-    widget.onScheduleAdded(schedule);
-    Navigator.of(context).pop();
+    
+    if (widget.hasConflict!(newSchedule, schedulesToCheck)) {
+      print('CONFLICT DETECTED - Showing dialog');
+      
+      // Find the conflicting schedule for display
+      GameSchedule? conflictingSchedule;
+      for (var existing in schedulesToCheck) {
+        if (existing.courtNumber.toLowerCase() == newSchedule.courtNumber.toLowerCase()) {
+          // Same date check
+          if (existing.startTime.year == newSchedule.startTime.year &&
+              existing.startTime.month == newSchedule.startTime.month &&
+              existing.startTime.day == newSchedule.startTime.day) {
+            // Time overlap check
+            if (existing.startTime.isBefore(newSchedule.endTime) && 
+                newSchedule.startTime.isBefore(existing.endTime)) {
+              conflictingSchedule = existing;
+              break;
+            }
+          }
+        }
+      }
+      
+      if (conflictingSchedule != null) {
+        final shouldSaveAnyway = await _showConflictDialog(newSchedule, conflictingSchedule);
+        if (!shouldSaveAnyway) {
+          print('User cancelled - Schedule not saved');
+          return;
+        } else {
+          print('User chose to save anyway');
+        }
+      }
+    } else {
+      print('NO CONFLICTS - Safe to save');
+    }
+  } else {
+    print('No conflict checker provided - Skipping conflict check');
   }
 
+  print('SAVING SCHEDULE');
+  widget.onScheduleAdded(newSchedule);
+  Navigator.of(context).pop();
+  print('Schedule saved and dialog closed');
+}
+
+Future<bool> _showConflictDialog(GameSchedule newSchedule, GameSchedule conflictingSchedule) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.warning, color: Colors.orange),
+          SizedBox(width: 8),
+          Text('Schedule Conflict'),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'The new schedule conflicts with an existing one:',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('EXISTING:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                Text('Court ${conflictingSchedule.courtNumber}: ${conflictingSchedule.startTime.hour}:${conflictingSchedule.startTime.minute.toString().padLeft(2, '0')} - ${conflictingSchedule.endTime.hour}:${conflictingSchedule.endTime.minute.toString().padLeft(2, '0')}'),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('NEW:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                Text('Court ${newSchedule.courtNumber}: ${newSchedule.startTime.hour}:${newSchedule.startTime.minute.toString().padLeft(2, '0')} - ${newSchedule.endTime.hour}:${newSchedule.endTime.minute.toString().padLeft(2, '0')}'),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          const Text('Do you want to save it anyway?'),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: const Text('Save Anyway'),
+        ),
+      ],
+    ),
+  );
+  
+  return result ?? false;
+}
   @override
   Widget build(BuildContext context) {
     return Dialog(
